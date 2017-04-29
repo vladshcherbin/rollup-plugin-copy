@@ -3,15 +3,11 @@ var fse = require("fs-extra");
 var colors = require("colors");
 
 function success(name, src, dest) {
-    console.log();
-    console.log(name + ": '" + src.green + "' -> '" + dest.green + "' (" +  "\u2714".green + ")");
-    console.log();    
+    console.log(name + ": '" + src.green + "' -> '" + dest.green + "' (" +  "\u2714".green + ")"); 
 }
 
 function fatal(name, src, dest, err) {
-    console.error();
     console.error(name + ": '" + src.red + "' -> '" + dest.red + "' (" +  "\u2718".red + ")");
-    console.error();
     console.error("    " + err);
     process.exit(-1);
 }
