@@ -24,9 +24,11 @@ export default {
     plugins: [
         ...
         copy({
-            src: "path/to/some/assets.ext",
-            dest: "path/to/public/assets.ext",
-        }),
+            "src/index.html": "dist/index.html",
+            "node_modules/bootstrap/dist": "dist/vendor/bootstrap",
+            "node_modules/font-awesome": "dist/vendor/font-awesome",
+            verbose: true
+        })
         ...
     ]
     ...
@@ -35,7 +37,5 @@ export default {
 
 ## Options
 
-* `src` `<String>` : source file to copy
-* `dest` `<String>` : where to copy the file
-* `verbose`: `<boolean>` : display verbose message 
+* `verbose`: `<boolean>` : display verbose message  (default is `false`)
 
