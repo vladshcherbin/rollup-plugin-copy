@@ -39,5 +39,5 @@ export default {
 
 * `verbose`: `<boolean>` : display verbose message  (default is `false`)
 
-![verbose](verbose.png 200x)
+![verbose](verbose.png)
 
