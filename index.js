@@ -16,7 +16,7 @@ function fatal(name, src, dest, err) {
     process.exit(-1);
 }
 
-function copy(options={}) {
+module.exports = function(options={}) {
     const { 
         src, 
         dest, 
@@ -36,4 +36,3 @@ function copy(options={}) {
     }
 };
 
-export default copy;
