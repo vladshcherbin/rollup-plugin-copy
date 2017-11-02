@@ -7,7 +7,7 @@
 This package can be installed using npm:
 
 ```
-npm install rollup-copy-plugin
+npm install rollup-plugin-copy
 ```
 
 ## Usage
