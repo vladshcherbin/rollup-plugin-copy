@@ -1,6 +1,6 @@
 # rollup-plugin-copy
 
-*Very* basic rollup plugin to copy static assets over to you public directory. Files are copied using [fs-extra.copy](https://github.com/jprichardson/node-fs-extra/blob/master/docs/copy.md) 
+*Very* basic Rollup plugin to copy static assets over to your public directory. Files are copied using [fs-extra.copy](https://github.com/jprichardson/node-fs-extra/blob/master/docs/copy.md) 
 
 ## Installation
 
