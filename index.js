@@ -20,19 +20,17 @@ module.exports = function(options={}) {
     return {
         name: name,
         ongenerate: function(object) {
-
-            for (key in options) {
+            for (let key in options) {
                 if (key == "verbose") continue;
                 const src = key;
                 const dest = options[key];
-
-                fse.copy(src, dest).then( () => {
+                try {
+                    fse.copySync(src, dest)
                     if (verbose) success(name, src, dest);
-                }).catch( (err) => {
+                } catch (err) {
                     fatal(name, src, dest, err);
-                });
+                }
             }
-
         }
     }
 };
