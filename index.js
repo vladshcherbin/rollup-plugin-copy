@@ -24,12 +24,16 @@ module.exports = function(options={}) {
             for (key in options) {
                 if (key == "verbose") continue;
                 const src = key;
-                const dest = options[key];
-
-                fse.copy(src, dest).then( () => {
-                    if (verbose) success(name, src, dest);
-                }).catch( (err) => {
-                    fatal(name, src, dest, err);
+                const dests = options[key];
+                const tasks = Array.isArray(dests)
+                    ? dests
+                    : [ dests ];
+                tasks.forEach(dest => {
+                    fse.copy(src, dest).then( () => {
+                        if (verbose) success(name, src, dest);
+                    }).catch( (err) => {
+                        fatal(name, src, dest, err);
+                    });
                 });
             }
 
