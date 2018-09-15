@@ -27,6 +27,7 @@ export default {
             "src/index.html": "dist/index.html",
             "node_modules/bootstrap/dist": "dist/vendor/bootstrap",
             "node_modules/font-awesome": "dist/vendor/font-awesome",
+            "src/main.html": [ "dist/main.html", "lib/main.html" ],
             verbose: true
         })
         ...
