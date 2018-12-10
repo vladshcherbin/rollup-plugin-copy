@@ -27,7 +27,7 @@ export default {
             "src/index.html": "dist/index.html",
             "node_modules/bootstrap/dist": "dist/vendor/bootstrap",
             "node_modules/font-awesome": "dist/vendor/font-awesome",
-            verbose: true
+            verbose: true,
         })
         ...
     ]
@@ -38,6 +38,8 @@ export default {
 ## Options
 
 * `verbose`: `<boolean>` : display verbose message  (default is `false`)
+* `overwrite`: `<boolean>` : overwrite the file if it exists (default is `false`)
+* `overwrite`: `<boolean>` : errorOnExit emit an error if the destination file exists (default is `false`)
 
 ![verbose](verbose.png)
 

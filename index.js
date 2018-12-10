@@ -14,7 +14,7 @@ function fatal(name, src, dest, err) {
 }
 
 module.exports = function(options={}) {
-    const { verbose=false } = options;
+    const { verbose = false, overwrite = false, errorOnExist = false } = options
     const name = "rollup-plugin-copy";
 
     return {
@@ -25,12 +25,16 @@ module.exports = function(options={}) {
                 if (key == "verbose") continue;
                 const src = key;
                 const dest = options[key];
-
-                fse.copy(src, dest).then( () => {
-                    if (verbose) success(name, src, dest);
-                }).catch( (err) => {
-                    fatal(name, src, dest, err);
-                });
+                if (fse.pathExists(dest) && !overwrite) return
+                fse
+                  .copy(src, dest, { overwrite: overwrite, errorOnExist: errorOnExist })
+                  .then(() => {
+                    if (verbose) success(name, src, dest)
+                  })
+                  .catch(err => {
+                    fatal(name, src, dest, err)
+                  })
+                ;
             }
 
         }
