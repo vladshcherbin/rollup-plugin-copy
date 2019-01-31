@@ -19,7 +19,7 @@ module.exports = function(options={}) {
 
     return {
         name: name,
-        ongenerate: function(object) {
+        generateBundle: function(object) {
 
             for (key in options) {
                 if (key == "verbose") continue;
