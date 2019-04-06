@@ -4,15 +4,21 @@
   "version": "0.3.0",
   "author": "Vlad Shcherbin <vlad.shcherbin@gmail.com>",
   "repository": "vladshcherbin/rollup-plugin-copy",
-  "main": "index.js",
+  "main": "dist/index.commonjs.js",
+  "module": "dist/index.module.js",
   "scripts": {
-    "lint": "eslint src"
+    "lint": "eslint src",
+    "build": "rollup -c"
   },
   "dependencies": {},
   "devDependencies": {
+    "@babel/core": "^7.4.3",
+    "@babel/preset-env": "^7.4.3",
     "eslint": "^5.16.0",
     "eslint-config-airbnb-base": "^13.1.0",
-    "eslint-plugin-import": "^2.16.0"
+    "eslint-plugin-import": "^2.16.0",
+    "rollup": "^1.9.0",
+    "rollup-plugin-babel": "^4.3.2"
   },
   "peerDependencies": {
     "rollup": "^1.0.0"
