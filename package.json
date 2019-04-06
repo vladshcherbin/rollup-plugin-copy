@@ -16,5 +16,8 @@
   "dependencies": {
     "colors": "^1.1.2",
     "fs-extra": "^3.0.0"
+  },
+  "peerDependencies": {
+    "rollup": "^1.0.0"
   }
 }
