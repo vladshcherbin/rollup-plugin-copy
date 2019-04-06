@@ -5,7 +5,15 @@
   "author": "Vlad Shcherbin <vlad.shcherbin@gmail.com>",
   "repository": "vladshcherbin/rollup-plugin-copy",
   "main": "index.js",
+  "scripts": {
+    "lint": "eslint src"
+  },
   "dependencies": {},
+  "devDependencies": {
+    "eslint": "^5.16.0",
+    "eslint-config-airbnb-base": "^13.1.0",
+    "eslint-plugin-import": "^2.16.0"
+  },
   "peerDependencies": {
     "rollup": "^1.0.0"
   },
