@@ -7,8 +7,11 @@
   "main": "dist/index.commonjs.js",
   "module": "dist/index.module.js",
   "scripts": {
-    "lint": "eslint src",
+    "clean": "rimraf dist",
     "build": "rollup -c",
+    "lint": "eslint src tests",
+    "postpublish": "yarn clean",
+    "prepublishOnly": "yarn lint && yarn test && yarn clean && yarn build",
     "test": "jest"
   },
   "dependencies": {
@@ -24,6 +27,7 @@
     "eslint-config-airbnb-base": "^13.1.0",
     "eslint-plugin-import": "^2.16.0",
     "jest": "^24.7.1",
+    "rimraf": "^2.6.3",
     "rollup": "^1.9.0",
     "rollup-plugin-babel": "^4.3.2"
   },
