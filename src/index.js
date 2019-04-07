@@ -20,7 +20,7 @@ function processObjectOfTargets(targets) {
 
 export default function copy(options = {}) {
   const targets = options.targets || []
-  const outputFolder = options.outputFolder || ''
+  const { outputFolder } = options
   const verbose = options.verbose || false
   const warnOnNonExist = options.warnOnNonExist || false
 
