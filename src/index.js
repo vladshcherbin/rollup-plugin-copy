@@ -39,7 +39,7 @@ export default function copy(options = { verbose: false }) {
         processedTargets = processArrayOfTargets(targets, destFolder)
       }
 
-      if (isObject(targets) && Object.entries(options).length) {
+      if (isObject(targets) && Object.entries(targets).length) {
         processedTargets = processObjectOfTargets(targets, outputFolder)
       }
 
