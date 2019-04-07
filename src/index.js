@@ -22,6 +22,7 @@ export default function copy(options = {}) {
   const targets = options.targets || []
   const outputFolder = options.outputFolder || ''
   const verbose = options.verbose || false
+  const warnOnNonExist = options.warnOnNonExist || false
 
   return {
     name: 'copy',
@@ -51,7 +52,17 @@ export default function copy(options = {}) {
               console.log(chalk.green(`${from} -> ${to}`))
             }
           } catch (e) {
-            this.error(e)
+            if (e.code === 'ENOENT') {
+              if (verbose) {
+                console.log(chalk.red(`${from} -> ${to} (no such file or folder: ${e.path})`))
+              }
+
+              if (warnOnNonExist) {
+                this.warn(e)
+              }
+            } else {
+              this.error(e)
+            }
           }
         }))
       }

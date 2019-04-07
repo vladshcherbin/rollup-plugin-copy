@@ -1,6 +1,6 @@
 import { rollup } from 'rollup'
 import fs from 'fs-extra'
-import { green } from 'chalk'
+import { green, red } from 'chalk'
 import copy from '../src'
 
 process.chdir(`${__dirname}/fixtures`)
@@ -136,20 +136,20 @@ describe('Targets is an array', () => {
     expect(await fs.pathExists('build/css/css-2.css')).toBe(true)
   })
 
-  test('Throw if file doesn\'t exist', async () => {
+  test('Don\'t throw if file doesn\'t exist', async () => {
     await expect(build({
       targets: [
         'src/assets/asset-3.js'
       ]
-    })).rejects.toThrow('ENOENT: no such file or directory, stat \'src/assets/asset-3.js\'')
+    })).resolves.not.toThrow()
   })
 
-  test('Throw if folder doesn\'t exist', async () => {
+  test('Don\'t throw if folder doesn\'t exist', async () => {
     await expect(build({
       targets: [
         'src/assets/js'
       ]
-    })).rejects.toThrow('ENOENT: no such file or directory, stat \'src/assets/js\'')
+    })).resolves.not.toThrow()
   })
 })
 
@@ -230,20 +230,20 @@ describe('Targets is an object', () => {
     expect(await fs.pathExists('build/assets/css-2.css')).toBe(true)
   })
 
-  test('Throw if file doesn\'t exist', async () => {
+  test('Don\'t throw if file doesn\'t exist', async () => {
     await expect(build({
       targets: {
         'src/assets/asset-3.js': 'dist/assets'
       }
-    })).rejects.toThrow('ENOENT: no such file or directory, stat \'src/assets/asset-3.js\'')
+    })).resolves.not.toThrow()
   })
 
-  test('Throw if folder doesn\'t exist', async () => {
+  test('Don\'t throw if folder doesn\'t exist', async () => {
     await expect(build({
       targets: {
         'src/assets/js': 'dist/assets'
       }
-    })).rejects.toThrow('ENOENT: no such file or directory, stat \'src/assets/js\'')
+    })).resolves.not.toThrow()
   })
 })
 
@@ -280,15 +280,35 @@ describe('Options', () => {
     await build({
       targets: [
         'src/assets/asset-1.js',
-        'src/assets/scss'
+        'src/assets/scss',
+        'src/not-exist'
       ],
       verbose: true
     })
 
-    expect(console.log).toHaveBeenCalledTimes(3)
+    expect(console.log).toHaveBeenCalledTimes(4)
     expect(console.log).toHaveBeenCalledWith('Copied files and folders:')
     expect(console.log).toHaveBeenCalledWith(green('src/assets/asset-1.js -> dist/asset-1.js'))
     expect(console.log).toHaveBeenCalledWith(green('src/assets/scss -> dist/scss'))
+    expect(console.log).toHaveBeenCalledWith(
+      red('src/not-exist -> dist/not-exist (no such file or folder: src/not-exist)')
+    )
+  })
+
+  test('Warn if target doesn\'t exist', async () => {
+    console.warn = jest.fn()
+
+    await build({
+      targets: [
+        'src/assets/asset-1.js',
+        'src/assets/scss',
+        'src/not-exist'
+      ],
+      warnOnNonExist: true
+    })
+
+    expect(console.warn).toHaveBeenCalledTimes(1)
+    expect(console.warn).toHaveBeenCalledWith('ENOENT: no such file or directory, stat \'src/not-exist\'')
   })
   /* eslint-enable no-console */
 })
