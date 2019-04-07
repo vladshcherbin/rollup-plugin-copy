@@ -14,7 +14,7 @@ export default {
   ],
   plugins: [
     babel({
-      presets: [['@babel/preset-env', { targets: { node: 'current' } }]],
+      presets: [['@babel/preset-env', { targets: { node: 8 } }]],
       comments: false
     })
   ]

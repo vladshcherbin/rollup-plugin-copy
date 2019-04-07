@@ -49,5 +49,8 @@
     "file",
     "folder"
   ],
+  "engines": {
+    "node": ">=8"
+  },
   "license": "MIT"
 }
