@@ -1,5 +1,6 @@
 import { rollup } from 'rollup'
 import fs from 'fs-extra'
+import { green } from 'chalk'
 import copy from '../src'
 
 process.chdir(`${__dirname}/fixtures`)
@@ -202,7 +203,7 @@ describe('Targets is an object', () => {
 })
 
 describe('Options', () => {
-  test('Output folder, array as target', async () => {
+  test('Output folder, targets is an array', async () => {
     await build({
       targets: [
         'src/assets/asset-1.js',
@@ -221,7 +222,7 @@ describe('Options', () => {
     expect(await fs.pathExists('dist/assets/scss/nested/scss-3.scss')).toBe(true)
   })
 
-  test('Output folder, object as target', async () => {
+  test('Output folder, targets is an object', async () => {
     await build({
       targets: {
         'src/assets/asset-1.js': 'js/asset-1.js',
@@ -239,4 +240,23 @@ describe('Options', () => {
     expect(await fs.pathExists('dist/assets/styles/nested')).toBe(true)
     expect(await fs.pathExists('dist/assets/styles/nested/scss-3.scss')).toBe(true)
   })
+
+  /* eslint-disable no-console */
+  test('Verbose', async () => {
+    console.log = jest.fn()
+
+    await build({
+      targets: [
+        'src/assets/asset-1.js',
+        'src/assets/scss'
+      ],
+      verbose: true
+    })
+
+    expect(console.log).toHaveBeenCalledTimes(3)
+    expect(console.log).toHaveBeenCalledWith('Copied files and folders:')
+    expect(console.log).toHaveBeenCalledWith(green('src/assets/asset-1.js -> dist/asset-1.js'))
+    expect(console.log).toHaveBeenCalledWith(green('src/assets/scss -> dist/scss'))
+  })
+  /* eslint-enable no-console */
 })
