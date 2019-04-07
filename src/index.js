@@ -4,10 +4,6 @@ import fs from 'fs-extra'
 import chalk from 'chalk'
 import isObject from 'is-plain-object'
 
-function isProbablyFile(filePath) {
-  return path.extname(filePath).length > 1
-}
-
 function processArrayOfTargets(targets, outputFolder) {
   return targets.map(target => ({
     from: target,
@@ -15,18 +11,17 @@ function processArrayOfTargets(targets, outputFolder) {
   }))
 }
 
-function processObjectOfTargets(targets, outputFolder = '') {
-  return Object.entries(targets).map(([from, to]) => {
-    const dest = (isProbablyFile(from) && !isProbablyFile(to))
-      ? path.join(outputFolder, to, path.basename(from))
-      : path.join(outputFolder, to)
-
-    return { from, to: dest }
-  })
+function processObjectOfTargets(targets, outputFolder) {
+  return Object.entries(targets).map(([from, to]) => ({
+    from,
+    to: path.join(outputFolder, to)
+  }))
 }
 
-export default function copy(options = { verbose: false }) {
-  const { outputFolder, targets, verbose } = options
+export default function copy(options = {}) {
+  const targets = options.targets || []
+  const outputFolder = options.outputFolder || ''
+  const verbose = options.verbose || false
 
   return {
     name: 'copy',

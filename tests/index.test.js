@@ -173,18 +173,6 @@ describe('Targets is an object', () => {
     await fs.remove('build')
   })
 
-  test('File into folder', async () => {
-    await build({
-      targets: {
-        'src/assets/asset-1.js': 'dist/assets',
-        'src/assets/asset-2.js': 'dist/js'
-      }
-    })
-
-    expect(await fs.pathExists('dist/assets/asset-1.js')).toBe(true)
-    expect(await fs.pathExists('dist/js/asset-2.js')).toBe(true)
-  })
-
   test('Throw if file doesn\'t exist', async () => {
     await expect(build({
       targets: {
@@ -226,14 +214,12 @@ describe('Options', () => {
     await build({
       targets: {
         'src/assets/asset-1.js': 'js/asset-1.js',
-        'src/assets/asset-2.js': 'lib',
         'src/assets/scss': 'styles'
       },
       outputFolder: 'dist/assets'
     })
 
     expect(await fs.pathExists('dist/assets/js/asset-1.js')).toBe(true)
-    expect(await fs.pathExists('dist/assets/lib/asset-2.js')).toBe(true)
     expect(await fs.pathExists('dist/assets/styles')).toBe(true)
     expect(await fs.pathExists('dist/assets/styles/scss-1.scss')).toBe(true)
     expect(await fs.pathExists('dist/assets/styles/scss-2.scss')).toBe(true)
