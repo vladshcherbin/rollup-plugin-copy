@@ -11,10 +11,10 @@ function processArrayOfTargets(targets, outputFolder) {
   }))
 }
 
-function processObjectOfTargets(targets, outputFolder) {
+function processObjectOfTargets(targets) {
   return Object.entries(targets).map(([from, to]) => ({
     from,
-    to: path.join(outputFolder, to)
+    to
   }))
 }
 
@@ -35,7 +35,7 @@ export default function copy(options = {}) {
       }
 
       if (isObject(targets) && Object.entries(targets).length) {
-        processedTargets = processObjectOfTargets(targets, outputFolder)
+        processedTargets = processObjectOfTargets(targets)
       }
 
       if (processedTargets.length) {
@@ -48,7 +48,7 @@ export default function copy(options = {}) {
             await fs.copy(from, to)
 
             if (verbose) {
-              console.log(`${chalk.green(`${from} -> ${to}`)}`)
+              console.log(chalk.green(`${from} -> ${to}`))
             }
           } catch (e) {
             this.error(e)

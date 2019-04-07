@@ -51,12 +51,6 @@ afterAll(async () => {
   await fs.remove('lib')
 })
 
-test('No options passed', async () => {
-  await build()
-
-  expect(await fs.pathExists('dist/asset-1.js')).toBe(false)
-})
-
 describe('Targets is an array', () => {
   test('Empty array', async () => {
     await build({
@@ -254,7 +248,13 @@ describe('Targets is an object', () => {
 })
 
 describe('Options', () => {
-  test('Output folder, targets is an array', async () => {
+  test('No options passed', async () => {
+    await build()
+
+    expect(await fs.pathExists('dist/asset-1.js')).toBe(false)
+  })
+
+  test('Output folder', async () => {
     await build({
       targets: [
         'src/assets/asset-1.js',
@@ -271,23 +271,6 @@ describe('Options', () => {
     expect(await fs.pathExists('dist/assets/scss/scss-2.scss')).toBe(true)
     expect(await fs.pathExists('dist/assets/scss/nested')).toBe(true)
     expect(await fs.pathExists('dist/assets/scss/nested/scss-3.scss')).toBe(true)
-  })
-
-  test('Output folder, targets is an object', async () => {
-    await build({
-      targets: {
-        'src/assets/asset-1.js': 'js/asset-1.js',
-        'src/assets/scss': 'styles'
-      },
-      outputFolder: 'dist/assets'
-    })
-
-    expect(await fs.pathExists('dist/assets/js/asset-1.js')).toBe(true)
-    expect(await fs.pathExists('dist/assets/styles')).toBe(true)
-    expect(await fs.pathExists('dist/assets/styles/scss-1.scss')).toBe(true)
-    expect(await fs.pathExists('dist/assets/styles/scss-2.scss')).toBe(true)
-    expect(await fs.pathExists('dist/assets/styles/nested')).toBe(true)
-    expect(await fs.pathExists('dist/assets/styles/nested/scss-3.scss')).toBe(true)
   })
 
   /* eslint-disable no-console */
