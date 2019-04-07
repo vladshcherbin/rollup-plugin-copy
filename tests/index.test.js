@@ -5,26 +5,56 @@ import copy from '../src'
 
 process.chdir(`${__dirname}/fixtures`)
 
-async function build(options) {
-  const bundle = await rollup({
-    input: 'src/index.js',
-    plugins: [
-      copy(options)
-    ]
-  })
+async function build(copyOptions, buildOptions = {}) {
+  const chunks = buildOptions.chunks || false
+  const dir = buildOptions.dir || false
 
-  await bundle.write({
-    file: 'dist/index.js',
-    format: 'commonjs'
-  })
+  const bundle = !chunks
+    ? await rollup({
+      input: 'src/index.js',
+      plugins: [
+        copy(copyOptions)
+      ]
+    })
+    : await rollup({
+      input: [
+        'src/index.js',
+        'src/chunk-1.js'
+      ],
+      plugins: [
+        copy(copyOptions)
+      ]
+    })
+
+  if (!dir && !chunks) {
+    await bundle.write({
+      file: 'dist/index.js',
+      format: 'commonjs'
+    })
+  } else {
+    await bundle.write({
+      dir: 'build',
+      format: 'commonjs'
+    })
+  }
 }
 
 beforeEach(async () => {
+  await fs.remove('build')
   await fs.remove('dist')
+  await fs.remove('lib')
 })
 
 afterAll(async () => {
+  await fs.remove('build')
   await fs.remove('dist')
+  await fs.remove('lib')
+})
+
+test('No options passed', async () => {
+  await build()
+
+  expect(await fs.pathExists('dist/asset-1.js')).toBe(false)
 })
 
 describe('Targets is an array', () => {
@@ -74,6 +104,42 @@ describe('Targets is an array', () => {
     expect(await fs.pathExists('dist/scss/scss-2.scss')).toBe(true)
     expect(await fs.pathExists('dist/scss/nested')).toBe(true)
     expect(await fs.pathExists('dist/scss/nested/scss-3.scss')).toBe(true)
+  })
+
+  test('Ouput.dir is used', async () => {
+    await build({
+      targets: [
+        'src/assets/asset-1.js',
+        'src/assets/asset-2.js',
+        'src/assets/css'
+      ]
+    }, {
+      dir: true
+    })
+
+    expect(await fs.pathExists('build/asset-1.js')).toBe(true)
+    expect(await fs.pathExists('build/asset-2.js')).toBe(true)
+    expect(await fs.pathExists('build/css')).toBe(true)
+    expect(await fs.pathExists('build/css/css-1.css')).toBe(true)
+    expect(await fs.pathExists('build/css/css-2.css')).toBe(true)
+  })
+
+  test('Multiple input chunks are used', async () => {
+    await build({
+      targets: [
+        'src/assets/asset-1.js',
+        'src/assets/asset-2.js',
+        'src/assets/css'
+      ]
+    }, {
+      chunks: true
+    })
+
+    expect(await fs.pathExists('build/asset-1.js')).toBe(true)
+    expect(await fs.pathExists('build/asset-2.js')).toBe(true)
+    expect(await fs.pathExists('build/css')).toBe(true)
+    expect(await fs.pathExists('build/css/css-1.css')).toBe(true)
+    expect(await fs.pathExists('build/css/css-2.css')).toBe(true)
   })
 
   test('Throw if file doesn\'t exist', async () => {
@@ -168,9 +234,6 @@ describe('Targets is an object', () => {
     expect(await fs.pathExists('build/assets')).toBe(true)
     expect(await fs.pathExists('build/assets/css-1.css')).toBe(true)
     expect(await fs.pathExists('build/assets/css-2.css')).toBe(true)
-
-    await fs.remove('lib')
-    await fs.remove('build')
   })
 
   test('Throw if file doesn\'t exist', async () => {
