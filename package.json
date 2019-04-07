@@ -34,11 +34,18 @@
   "peerDependencies": {
     "rollup": "^1.0.0"
   },
+  "files": [
+    "dist",
+    "readme.md"
+  ],
   "keywords": [
     "rollup",
+    "rollup-plugin",
     "copy",
-    "plugin",
-    "rollup-plugin"
+    "cp",
+    "asset",
+    "file",
+    "folder"
   ],
   "license": "MIT"
 }
