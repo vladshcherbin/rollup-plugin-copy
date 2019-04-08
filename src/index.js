@@ -19,10 +19,13 @@ function processObjectOfTargets(targets) {
 }
 
 export default function copy(options = {}) {
-  const targets = options.targets || []
-  const { outputFolder } = options
-  const verbose = options.verbose || false
-  const warnOnNonExist = options.warnOnNonExist || false
+  const {
+    outputFolder,
+    targets = [],
+    verbose = false,
+    warnOnNonExist = false,
+    ...rest
+  } = options
 
   return {
     name: 'copy',
@@ -46,7 +49,7 @@ export default function copy(options = {}) {
 
         await Promise.all(processedTargets.map(async ({ from, to }) => {
           try {
-            await fs.copy(from, to)
+            await fs.copy(from, to, rest)
 
             if (verbose) {
               console.log(chalk.green(`${from} -> ${to}`))

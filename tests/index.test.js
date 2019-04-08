@@ -311,4 +311,14 @@ describe('Options', () => {
     expect(console.warn).toHaveBeenCalledWith('ENOENT: no such file or directory, stat \'src/not-exist\'')
   })
   /* eslint-enable no-console */
+
+  test('Rest options', async () => {
+    await expect(build({
+      targets: {
+        'src/assets/asset-1.js': 'src/existing.js'
+      },
+      overwrite: false,
+      errorOnExist: true
+    })).rejects.toThrow('\'src/existing.js\' already exists')
+  })
 })
