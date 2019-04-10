@@ -12,10 +12,23 @@ function processArrayOfTargets(targets, outputFolder) {
 }
 
 function processObjectOfTargets(targets) {
-  return Object.entries(targets).map(([from, to]) => ({
-    from,
-    to
-  }))
+  const processedTargets = [];
+  Object.entries(targets).forEach(([from, to]) => {
+    if (Array.isArray(to)) {
+      to.forEach(eachTo => {
+        processedTargets.push({
+          from,
+          to: eachTo,
+        })
+      })
+    } else {
+      processedTargets.push({
+        from,
+        to
+      })
+    }
+  });
+  return processedTargets;
 }
 
 export default function copy(options = {}) {
