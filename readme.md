@@ -59,7 +59,8 @@ copy({
   targets: {
     'src/assets': 'dist/public/assets',
     'src/index.html': 'dist/public/index.html',
-    'src/migrations': 'dist/migrations'
+    'src/migrations': 'dist/migrations',
+    'src/main.html': [ 'dist/main.html', 'lib/main.html' ],
   }
 })
 ```
