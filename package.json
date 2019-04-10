@@ -1,7 +1,7 @@
 {
   "name": "rollup-plugin-copy",
   "description": "Copy files and folders using Rollup",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "author": "Vlad Shcherbin <vlad.shcherbin@gmail.com>",
   "repository": "vladshcherbin/rollup-plugin-copy",
   "main": "dist/index.commonjs.js",
