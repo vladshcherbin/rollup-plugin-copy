@@ -28,8 +28,12 @@ export default function copy(options = {}) {
     ...rest
   } = options
 
+  let alreadyCopyTargets = []
   return {
     name: 'copy',
+    watchChange() {
+      alreadyCopyTargets = []
+    },
     async generateBundle(outputOptions) {
       let processedTargets = []
 
@@ -50,6 +54,11 @@ export default function copy(options = {}) {
 
         await Promise.all(processedTargets.map(async ({ from, to }) => {
           try {
+            // skip already copy targets
+            if (alreadyCopyTargets.find(target => target.from === from && target.to === to)) {
+              return
+            }
+            alreadyCopyTargets.push({ from, to })
             await fs.copy(from, to, rest)
 
             if (verbose) {
