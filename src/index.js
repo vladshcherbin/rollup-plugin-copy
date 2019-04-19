@@ -25,6 +25,7 @@ export default function copy(options = {}) {
     targets = [],
     verbose = false,
     warnOnNonExist = false,
+    skipRepetition = false,
     ...rest
   } = options
 
@@ -54,11 +55,14 @@ export default function copy(options = {}) {
 
         await Promise.all(processedTargets.map(async ({ from, to }) => {
           try {
-            // skip already copy targets
-            if (alreadyCopyTargets.find(target => target.from === from && target.to === to)) {
-              return
+            if (skipRepetition) {
+              // skip already copy targets
+              if (alreadyCopyTargets.find(target => target.from === from && target.to === to)) {
+                return
+              }
+              alreadyCopyTargets.push({ from, to })
             }
-            alreadyCopyTargets.push({ from, to })
+
             await fs.copy(from, to, rest)
 
             if (verbose) {

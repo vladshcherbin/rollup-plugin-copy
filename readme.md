@@ -103,6 +103,16 @@ copy({
 })
 ```
 
+### skipRepetition
+
+Will skip the copy with the same (from, to)
+
+```js
+copy({
+  skipRepetition: true
+})
+```
+
 All other options are passed directly to [fs-extra copy function](https://github.com/jprichardson/node-fs-extra/blob/7.0.0/docs/copy.md), which is used inside.
 
 ## Original Author
