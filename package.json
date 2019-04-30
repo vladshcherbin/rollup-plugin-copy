@@ -8,7 +8,6 @@
   "module": "dist/index.module.js",
   "scripts": {
     "clean": "rimraf coverage dist",
-    "coverage": "yarn test --coverage && yarn codecov",
     "build": "rollup -c",
     "lint": "eslint src tests",
     "postpublish": "yarn clean",

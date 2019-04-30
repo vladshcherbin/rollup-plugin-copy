@@ -3,4 +3,4 @@ node_js:
   - 10
   - 8
 script:
-  - yarn coverage
+  - jest --ci --coverage && codecov
