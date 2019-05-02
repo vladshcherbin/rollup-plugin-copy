@@ -50,7 +50,7 @@
     "folder"
   ],
   "engines": {
-    "node": ">=8"
+    "node": ">=8.3"
   },
   "license": "MIT"
 }

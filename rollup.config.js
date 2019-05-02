@@ -15,7 +15,7 @@ export default {
   ],
   plugins: [
     babel({
-      presets: [['@babel/preset-env', { targets: { node: 8 } }]],
+      presets: [['@babel/preset-env', { targets: { node: '8.3' } }]],
       comments: false
     }),
     autoExternal()
