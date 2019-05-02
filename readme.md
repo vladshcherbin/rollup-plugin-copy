@@ -36,7 +36,8 @@ export default {
       targets: [
         'src/migrations',
         'src/index.html'
-      ]
+      ],
+      outputFolder: 'dist'
     })
   ]
 }
@@ -44,7 +45,7 @@ export default {
 
 ### Configuration
 
-There are some useful options, all of them are optional:
+There are some useful options:
 
 #### targets
 
@@ -52,25 +53,27 @@ An array or an object with paths of files and folders to be copied. Default is `
 
 ```js
 copy({
-  targets: ['src/assets', 'src/index.html']
+  targets: ['src/assets', 'src/index.html'],
+  outputFolder: 'dist'
 })
 
 copy({
   targets: {
     'src/assets': 'dist/public/assets',
     'src/index.html': 'dist/public/index.html',
-    'src/migrations': 'dist/migrations',
     'src/favicon.ico': ['dist/favicon.ico', 'build/favicon.ico'],
     'src/images': ['dist/images', 'build/images']
   }
 })
 ```
 
-> Note: multiple destinations can be set using array syntax
+> Note: if an array, *outputFolder* is required to be set
+
+> Note: if an object, multiple destinations can be set using array syntax
 
 #### outputFolder
 
-Folder where files and folders will be copied. By default, bundle output folder is used.
+Folder where files and folders will be copied. Required to be set when *targets* is an array.
 
 ```js
 copy({
@@ -88,6 +91,7 @@ Output copied files and folders to console. Default is `false`.
 ```js
 copy({
   targets: ['src/assets', 'src/index.html'],
+  outputFolder: 'dist',
   verbose: true
 })
 ```
@@ -99,6 +103,7 @@ Warn if target file or folder doesn't exist. Default is `false`.
 ```js
 copy({
   targets: ['src/assets', 'src/index.html'],
+  outputFolder: 'dist',
   warnOnNonExist: true
 })
 ```
