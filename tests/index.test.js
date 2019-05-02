@@ -5,51 +5,19 @@ import copy from '../src'
 
 process.chdir(`${__dirname}/fixtures`)
 
-async function build(copyOptions, buildOptions = {}) {
-  const chunks = buildOptions.chunks || false
-  const dir = buildOptions.dir || false
+afterEach(async () => {
+  await fs.remove('build')
+  await fs.remove('dist')
+})
 
-  const bundle = !chunks
-    ? await rollup({
-      input: 'src/index.js',
-      plugins: [
-        copy(copyOptions)
-      ]
-    })
-    : await rollup({
-      input: [
-        'src/index.js',
-        'src/chunk-1.js'
-      ],
-      plugins: [
-        copy(copyOptions)
-      ]
-    })
-
-  if (!dir && !chunks) {
-    await bundle.write({
-      file: 'dist/index.js',
-      format: 'commonjs'
-    })
-  } else {
-    await bundle.write({
-      dir: 'build',
-      format: 'commonjs'
-    })
-  }
+async function build(options) {
+  await rollup({
+    input: 'src/index.js',
+    plugins: [
+      copy(options)
+    ]
+  })
 }
-
-beforeEach(async () => {
-  await fs.remove('build')
-  await fs.remove('dist')
-  await fs.remove('lib')
-})
-
-afterAll(async () => {
-  await fs.remove('build')
-  await fs.remove('dist')
-  await fs.remove('lib')
-})
 
 describe('Targets is an array', () => {
   test('Empty array', async () => {
@@ -64,7 +32,8 @@ describe('Targets is an array', () => {
     await build({
       targets: [
         'src/assets/asset-1.js'
-      ]
+      ],
+      outputFolder: 'dist'
     })
 
     expect(await fs.pathExists('dist/asset-1.js')).toBe(true)
@@ -75,7 +44,8 @@ describe('Targets is an array', () => {
       targets: [
         'src/assets/asset-1.js',
         'src/assets/asset-2.js'
-      ]
+      ],
+      outputFolder: 'dist'
     })
 
     expect(await fs.pathExists('dist/asset-1.js')).toBe(true)
@@ -87,7 +57,8 @@ describe('Targets is an array', () => {
       targets: [
         'src/assets/css',
         'src/assets/scss'
-      ]
+      ],
+      outputFolder: 'dist'
     })
 
     expect(await fs.pathExists('dist/css')).toBe(true)
@@ -100,47 +71,20 @@ describe('Targets is an array', () => {
     expect(await fs.pathExists('dist/scss/nested/scss-3.scss')).toBe(true)
   })
 
-  test('Ouput.dir is used', async () => {
-    await build({
+  test('Throw if outputFolder is not set', async () => {
+    await expect(build({
       targets: [
-        'src/assets/asset-1.js',
-        'src/assets/asset-2.js',
-        'src/assets/css'
+        'src/assets/asset-1.js'
       ]
-    }, {
-      dir: true
-    })
-
-    expect(await fs.pathExists('build/asset-1.js')).toBe(true)
-    expect(await fs.pathExists('build/asset-2.js')).toBe(true)
-    expect(await fs.pathExists('build/css')).toBe(true)
-    expect(await fs.pathExists('build/css/css-1.css')).toBe(true)
-    expect(await fs.pathExists('build/css/css-2.css')).toBe(true)
-  })
-
-  test('Multiple input chunks are used', async () => {
-    await build({
-      targets: [
-        'src/assets/asset-1.js',
-        'src/assets/asset-2.js',
-        'src/assets/css'
-      ]
-    }, {
-      chunks: true
-    })
-
-    expect(await fs.pathExists('build/asset-1.js')).toBe(true)
-    expect(await fs.pathExists('build/asset-2.js')).toBe(true)
-    expect(await fs.pathExists('build/css')).toBe(true)
-    expect(await fs.pathExists('build/css/css-1.css')).toBe(true)
-    expect(await fs.pathExists('build/css/css-2.css')).toBe(true)
+    })).rejects.toThrow('\'outputFolder\' is not set. It is required if \'targets\' is an array')
   })
 
   test('Don\'t throw if file doesn\'t exist', async () => {
     await expect(build({
       targets: [
         'src/assets/asset-3.js'
-      ]
+      ],
+      outputFolder: 'dist'
     })).resolves.not.toThrow()
   })
 
@@ -148,7 +92,8 @@ describe('Targets is an array', () => {
     await expect(build({
       targets: [
         'src/assets/js'
-      ]
+      ],
+      outputFolder: 'dist'
     })).resolves.not.toThrow()
   })
 })
@@ -216,48 +161,34 @@ describe('Targets is an object', () => {
     expect(await fs.pathExists('dist/nested/folder/nested/scss-3.scss')).toBe(true)
   })
 
-  test('Non-existing output path', async () => {
-    await build({
-      targets: {
-        'src/assets/asset-1.js': 'lib/assets/asset-1.js',
-        'src/assets/css': 'build/assets'
-      }
-    })
-
-    expect(await fs.pathExists('lib/assets/asset-1.js')).toBe(true)
-    expect(await fs.pathExists('build/assets')).toBe(true)
-    expect(await fs.pathExists('build/assets/css-1.css')).toBe(true)
-    expect(await fs.pathExists('build/assets/css-2.css')).toBe(true)
-  })
-
   test('Array output path', async () => {
     await build({
       targets: {
         'src/assets/asset-1.js': [],
-        'src/assets/asset-2.js': ['dist/asset-2.js', 'lib/asset-2.js'],
-        'src/assets/scss': ['dist/scss', 'lib/scss']
+        'src/assets/asset-2.js': ['dist/asset-2.js', 'build/asset-2.js'],
+        'src/assets/scss': ['dist/scss', 'build/scss']
       }
     })
 
     expect(await fs.pathExists('dist/asset-1.js')).toBe(false)
     expect(await fs.pathExists('dist/asset-2.js')).toBe(true)
-    expect(await fs.pathExists('lib/asset-2.js')).toBe(true)
+    expect(await fs.pathExists('build/asset-2.js')).toBe(true)
     expect(await fs.pathExists('dist/scss')).toBe(true)
     expect(await fs.pathExists('dist/scss/scss-1.scss')).toBe(true)
     expect(await fs.pathExists('dist/scss/scss-2.scss')).toBe(true)
     expect(await fs.pathExists('dist/scss/nested')).toBe(true)
     expect(await fs.pathExists('dist/scss/nested/scss-3.scss')).toBe(true)
-    expect(await fs.pathExists('lib/scss')).toBe(true)
-    expect(await fs.pathExists('lib/scss/scss-1.scss')).toBe(true)
-    expect(await fs.pathExists('lib/scss/scss-2.scss')).toBe(true)
-    expect(await fs.pathExists('lib/scss/nested')).toBe(true)
-    expect(await fs.pathExists('lib/scss/nested/scss-3.scss')).toBe(true)
+    expect(await fs.pathExists('build/scss')).toBe(true)
+    expect(await fs.pathExists('build/scss/scss-1.scss')).toBe(true)
+    expect(await fs.pathExists('build/scss/scss-2.scss')).toBe(true)
+    expect(await fs.pathExists('build/scss/nested')).toBe(true)
+    expect(await fs.pathExists('build/scss/nested/scss-3.scss')).toBe(true)
   })
 
   test('Don\'t throw if file doesn\'t exist', async () => {
     await expect(build({
       targets: {
-        'src/assets/asset-3.js': 'dist/assets'
+        'src/assets/asset-3.js': 'dist/assets/asset-3.js'
       }
     })).resolves.not.toThrow()
   })
@@ -265,7 +196,7 @@ describe('Targets is an object', () => {
   test('Don\'t throw if folder doesn\'t exist', async () => {
     await expect(build({
       targets: {
-        'src/assets/js': 'dist/assets'
+        'src/assets/js': 'dist/assets/js'
       }
     })).resolves.not.toThrow()
   })
@@ -278,25 +209,6 @@ describe('Options', () => {
     expect(await fs.pathExists('dist/asset-1.js')).toBe(false)
   })
 
-  test('Output folder', async () => {
-    await build({
-      targets: [
-        'src/assets/asset-1.js',
-        'src/assets/asset-2.js',
-        'src/assets/scss'
-      ],
-      outputFolder: 'dist/assets'
-    })
-
-    expect(await fs.pathExists('dist/assets/asset-1.js')).toBe(true)
-    expect(await fs.pathExists('dist/assets/asset-2.js')).toBe(true)
-    expect(await fs.pathExists('dist/assets/scss')).toBe(true)
-    expect(await fs.pathExists('dist/assets/scss/scss-1.scss')).toBe(true)
-    expect(await fs.pathExists('dist/assets/scss/scss-2.scss')).toBe(true)
-    expect(await fs.pathExists('dist/assets/scss/nested')).toBe(true)
-    expect(await fs.pathExists('dist/assets/scss/nested/scss-3.scss')).toBe(true)
-  })
-
   /* eslint-disable no-console */
   test('Verbose', async () => {
     console.log = jest.fn()
@@ -307,6 +219,7 @@ describe('Options', () => {
         'src/assets/scss',
         'src/not-exist'
       ],
+      outputFolder: 'dist',
       verbose: true
     })
 
@@ -328,6 +241,7 @@ describe('Options', () => {
         'src/assets/scss',
         'src/not-exist'
       ],
+      outputFolder: 'dist',
       warnOnNonExist: true
     })
 
