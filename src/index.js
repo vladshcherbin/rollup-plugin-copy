@@ -30,13 +30,15 @@ export default function copy(options = {}) {
 
   return {
     name: 'copy',
-    async generateBundle(outputOptions) {
+    async buildEnd() {
       let processedTargets = []
 
       if (Array.isArray(targets) && targets.length) {
-        const destFolder = outputFolder || outputOptions.dir || path.dirname(outputOptions.file)
+        if (!outputFolder) {
+          this.error('\'outputFolder\' is not set. It is required if \'targets\' is an array')
+        }
 
-        processedTargets = processArrayOfTargets(targets, destFolder)
+        processedTargets = processArrayOfTargets(targets, outputFolder)
       }
 
       if (isObject(targets) && Object.entries(targets).length) {
