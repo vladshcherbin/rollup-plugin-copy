@@ -21,6 +21,7 @@ function processObjectOfTargets(targets) {
 
 export default function copy(options = {}) {
   const {
+    hook = 'buildEnd',
     outputFolder,
     targets = [],
     verbose = false,
@@ -30,7 +31,7 @@ export default function copy(options = {}) {
 
   return {
     name: 'copy',
-    async buildEnd() {
+    async [hook]() {
       let processedTargets = []
 
       if (Array.isArray(targets) && targets.length) {

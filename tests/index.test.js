@@ -209,6 +209,22 @@ describe('Options', () => {
     expect(await fs.pathExists('dist/asset-1.js')).toBe(false)
   })
 
+  test('Hook', async () => {
+    await build({
+      targets: [
+        'src/assets/asset-1.js',
+        'src/assets/css'
+      ],
+      outputFolder: 'dist',
+      hook: 'buildStart'
+    })
+
+    expect(await fs.pathExists('dist/asset-1.js')).toBe(true)
+    expect(await fs.pathExists('dist/css')).toBe(true)
+    expect(await fs.pathExists('dist/css/css-1.css')).toBe(true)
+    expect(await fs.pathExists('dist/css/css-2.css')).toBe(true)
+  })
+
   /* eslint-disable no-console */
   test('Verbose', async () => {
     console.log = jest.fn()

@@ -108,6 +108,18 @@ copy({
 })
 ```
 
+#### hook
+
+Set which rollup hook the plugin should use. Default is `buildEnd`.
+
+```js
+copy({
+  targets: ['src/assets', 'src/index.html'],
+  outputFolder: 'dist',
+  hook: 'generateBundle'
+})
+```
+
 All other options are passed directly to [fs-extra copy function](https://github.com/jprichardson/node-fs-extra/blob/7.0.0/docs/copy.md), which is used inside.
 
 ## Original Author
