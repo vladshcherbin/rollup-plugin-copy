@@ -51,8 +51,10 @@ export default function copy(options = {}) {
           console.log('Copied files and folders:')
         }
 
-        await Promise.all(processedTargets.map(async ({ from, to }) => {
+        // eslint-disable-next-line no-restricted-syntax
+        for (const { from, to } of processedTargets) {
           try {
+            // eslint-disable-next-line no-await-in-loop
             await fs.copy(from, to, rest)
 
             if (verbose) {
@@ -71,7 +73,7 @@ export default function copy(options = {}) {
               this.error(e)
             }
           }
-        }))
+        }
       }
     }
   }
