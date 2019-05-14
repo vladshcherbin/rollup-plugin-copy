@@ -5,7 +5,6 @@ module.exports = {
   ],
   watchPathIgnorePatterns: [
     '<rootDir>/tests/fixtures/build',
-    '<rootDir>/tests/fixtures/dist',
-    '<rootDir>/tests/fixtures/src/existing.js'
+    '<rootDir>/tests/fixtures/dist'
   ]
 }
