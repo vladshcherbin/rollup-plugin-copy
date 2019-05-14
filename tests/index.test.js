@@ -136,6 +136,20 @@ describe('Copy', () => {
     expect(await fs.pathExists('build/scss-3.scss')).toBe(true)
   })
 
+  test('Same target', async () => {
+    await build({
+      targets: [
+        'src/assets/css',
+        'src/assets/css'
+      ],
+      outputFolder: 'dist'
+    })
+
+    expect(await fs.pathExists('dist/css')).toBe(true)
+    expect(await fs.pathExists('dist/css/css-1.css')).toBe(true)
+    expect(await fs.pathExists('dist/css/css-2.css')).toBe(true)
+  })
+
   test('Throw if target is an object with no src or dest', async () => {
     await expect(build({
       targets: [
