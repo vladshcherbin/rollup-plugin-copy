@@ -17,6 +17,7 @@
   "dependencies": {
     "chalk": "^2.4.2",
     "fs-extra": "^7.0.1",
+    "globby": "^9.2.0",
     "is-plain-object": "^3.0.0"
   },
   "devDependencies": {

@@ -1,22 +1,24 @@
-/* eslint-disable no-console */
+/* eslint-disable no-await-in-loop, no-console, no-restricted-syntax */
 import path from 'path'
+import util from 'util'
 import fs from 'fs-extra'
-import chalk from 'chalk'
+import globby from 'globby'
 import isObject from 'is-plain-object'
+import chalk from 'chalk'
 
-function processArrayOfTargets(targets, outputFolder) {
-  return targets.map(target => ({
-    from: target,
-    to: path.join(outputFolder, path.basename(target))
-  }))
+function stringify(target) {
+  return util.inspect(target, { breakLength: Infinity })
 }
 
-function processObjectOfTargets(targets) {
-  return Object.entries(targets).reduce((processedTargets, [from, to]) => (
-    Array.isArray(to)
-      ? [...processedTargets, ...to.map(target => ({ from, to: target }))]
-      : [...processedTargets, { from, to }]
-  ), [])
+async function processTarget(src, dest, options) {
+  const matchedPaths = await globby(src, { expandDirectories: false, onlyFiles: false, ...options })
+
+  return !matchedPaths.length
+    ? [{ src, dest, nonExist: true }]
+    : matchedPaths.map(matchedPath => ({
+      src: matchedPath,
+      dest: path.join(dest, path.basename(matchedPath))
+    }))
 }
 
 export default function copy(options = {}) {
@@ -32,46 +34,50 @@ export default function copy(options = {}) {
   return {
     name: 'copy',
     async [hook]() {
-      let processedTargets = []
+      const itemsToCopy = []
 
       if (Array.isArray(targets) && targets.length) {
-        if (!outputFolder) {
-          this.error('\'outputFolder\' is not set. It is required if \'targets\' is an array')
+        for (const target of targets) {
+          if (isObject(target)) {
+            if (!target.src || !target.dest) {
+              this.error(`'src' or 'dest' is not set in ${stringify(target)}`)
+            }
+
+            itemsToCopy.push(...await processTarget(target.src, target.dest, rest))
+          } else {
+            if (!outputFolder) {
+              this.error(`'outputFolder' is not set for ${stringify(target)}`)
+            }
+
+            itemsToCopy.push(...await processTarget(target, outputFolder, rest))
+          }
         }
-
-        processedTargets = processArrayOfTargets(targets, outputFolder)
       }
 
-      if (isObject(targets) && Object.entries(targets).length) {
-        processedTargets = processObjectOfTargets(targets)
-      }
-
-      if (processedTargets.length) {
+      if (itemsToCopy.length) {
         if (verbose) {
           console.log('Copied files and folders:')
         }
 
-        // eslint-disable-next-line no-restricted-syntax
-        for (const { from, to } of processedTargets) {
+        for (const { src, dest, nonExist } of itemsToCopy) {
           try {
-            // eslint-disable-next-line no-await-in-loop
-            await fs.copy(from, to, rest)
+            if (!nonExist) {
+              await fs.copy(src, dest, rest)
 
-            if (verbose) {
-              console.log(chalk.green(`${from} -> ${to}`))
-            }
-          } catch (e) {
-            if (e.code === 'ENOENT') {
               if (verbose) {
-                console.log(chalk.red(`${from} -> ${to} (no such file or folder: ${e.path})`))
+                console.log(chalk.green(`${stringify(src)} -> ${stringify(dest)}`))
+              }
+            } else {
+              if (verbose) {
+                console.log(chalk.red(`${stringify(src)} -> ${stringify(dest)} (no items to copy)`))
               }
 
               if (warnOnNonExist) {
-                this.warn(e)
+                this.warn(`No items to copy - ${stringify(src)} -> ${stringify(dest)}`)
               }
-            } else {
-              this.error(e)
             }
+          } catch (e) {
+            this.error(e)
           }
         }
       }
