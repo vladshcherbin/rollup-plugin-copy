@@ -4,7 +4,7 @@ import util from 'util'
 import fs from 'fs-extra'
 import globby from 'globby'
 import isObject from 'is-plain-object'
-import chalk from 'chalk'
+import { bold, green, yellow } from 'colorette'
 
 function stringify(target) {
   return util.inspect(target, { breakLength: Infinity })
@@ -26,11 +26,11 @@ export default function copy(options = {}) {
       if (Array.isArray(targets) && targets.length) {
         for (const target of targets) {
           if (!isObject(target)) {
-            this.error(`target should be an object - ${stringify(target)}`)
+            throw new Error(`${stringify(target)} target must be an object`)
           }
 
           if (!target.src || !target.dest) {
-            this.error(`'src' or 'dest' is not set in ${stringify(target)}`)
+            throw new Error(`${stringify(target)} target must have "src" and "dest" properties`)
           }
 
           const matchedPaths = await globby(target.src, {
@@ -52,7 +52,7 @@ export default function copy(options = {}) {
 
       if (itemsToCopy.length) {
         if (verbose) {
-          console.log('Copied files and folders:')
+          console.log(green('copied:'))
         }
 
         for (const { src, dest } of itemsToCopy) {
@@ -60,14 +60,14 @@ export default function copy(options = {}) {
             await fs.copy(src, dest, rest)
 
             if (verbose) {
-              console.log(chalk.green(`${src} -> ${dest}`))
+              console.log(green(`  ${bold(src)} → ${bold(dest)}`))
             }
           } catch (e) {
             this.error(e)
           }
         }
       } else if (verbose) {
-        console.log('No items to copy')
+        console.log(yellow('no items to copy'))
       }
     }
   }

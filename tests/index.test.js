@@ -1,6 +1,6 @@
 import { rollup } from 'rollup'
 import fs from 'fs-extra'
-import { green } from 'chalk'
+import { bold, yellow, green } from 'colorette'
 import copy from '../src'
 
 process.chdir(`${__dirname}/fixtures`)
@@ -129,15 +129,17 @@ describe('Copy', () => {
       targets: [
         'src/assets/asset-1.js'
       ]
-    })).rejects.toThrow('target should be an object - \'src/assets/asset-1.js\'')
+    })).rejects.toThrow('\'src/assets/asset-1.js\' target must be an object')
   })
 
-  test('Throw if target is an object with no src or dest', async () => {
+  test('Throw if target object doesn\'t have required properties', async () => {
     await expect(build({
       targets: [
         { src: 'src/assets/asset-1.js' }
       ]
-    })).rejects.toThrow('\'src\' or \'dest\' is not set in { src: \'src/assets/asset-1.js\' }')
+    }))
+      .rejects
+      .toThrow('{ src: \'src/assets/asset-1.js\' } target must have "src" and "dest" properties')
   })
 })
 
@@ -160,11 +162,19 @@ describe('Options', () => {
     })
 
     expect(console.log).toHaveBeenCalledTimes(5)
-    expect(console.log).toHaveBeenCalledWith('Copied files and folders:')
-    expect(console.log).toHaveBeenCalledWith(green('src/assets/asset-1.js -> dist/asset-1.js'))
-    expect(console.log).toHaveBeenCalledWith(green('src/assets/css/css-1.css -> dist/css-1.css'))
-    expect(console.log).toHaveBeenCalledWith(green('src/assets/css/css-2.css -> dist/css-2.css'))
-    expect(console.log).toHaveBeenCalledWith(green('src/assets/scss -> dist/scss'))
+    expect(console.log).toHaveBeenCalledWith(green('copied:'))
+    expect(console.log).toHaveBeenCalledWith(
+      green(`  ${bold('src/assets/asset-1.js')} → ${bold('dist/asset-1.js')}`)
+    )
+    expect(console.log).toHaveBeenCalledWith(
+      green(`  ${bold('src/assets/css/css-1.css')} → ${bold('dist/css-1.css')}`)
+    )
+    expect(console.log).toHaveBeenCalledWith(
+      green(`  ${bold('src/assets/css/css-2.css')} → ${bold('dist/css-2.css')}`)
+    )
+    expect(console.log).toHaveBeenCalledWith(
+      green(`  ${bold('src/assets/scss')} → ${bold('dist/scss')}`)
+    )
   })
 
   test('Verbose, no items to copy', async () => {
@@ -178,7 +188,7 @@ describe('Options', () => {
     })
 
     expect(console.log).toHaveBeenCalledTimes(1)
-    expect(console.log).toHaveBeenCalledWith('No items to copy')
+    expect(console.log).toHaveBeenCalledWith(yellow('no items to copy'))
   })
   /* eslint-enable no-console */
 
