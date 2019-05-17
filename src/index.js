@@ -10,6 +10,13 @@ function stringify(target) {
   return util.inspect(target, { breakLength: Infinity })
 }
 
+function generateCopyTarget(src, dest) {
+  return {
+    src,
+    dest: path.join(dest, path.basename(src))
+  }
+}
+
 export default function copy(options = {}) {
   const {
     hook = 'buildEnd',
@@ -20,8 +27,8 @@ export default function copy(options = {}) {
 
   return {
     name: 'copy',
-    async [hook]() {
-      const itemsToCopy = []
+    [hook]: async () => {
+      const copyTargets = []
 
       if (Array.isArray(targets) && targets.length) {
         for (const target of targets) {
@@ -41,29 +48,26 @@ export default function copy(options = {}) {
 
           if (matchedPaths.length) {
             matchedPaths.forEach((matchedPath) => {
-              itemsToCopy.push({
-                src: matchedPath,
-                dest: path.join(target.dest, path.basename(matchedPath))
-              })
+              const generatedCopyTargets = Array.isArray(target.dest)
+                ? target.dest.map(dest => generateCopyTarget(matchedPath, dest))
+                : [generateCopyTarget(matchedPath, target.dest)]
+
+              copyTargets.push(...generatedCopyTargets)
             })
           }
         }
       }
 
-      if (itemsToCopy.length) {
+      if (copyTargets.length) {
         if (verbose) {
           console.log(green('copied:'))
         }
 
-        for (const { src, dest } of itemsToCopy) {
-          try {
-            await fs.copy(src, dest, rest)
+        for (const { src, dest } of copyTargets) {
+          await fs.copy(src, dest, rest)
 
-            if (verbose) {
-              console.log(green(`  ${bold(src)} → ${bold(dest)}`))
-            }
-          } catch (e) {
-            this.error(e)
+          if (verbose) {
+            console.log(green(`  ${bold(src)} → ${bold(dest)}`))
           }
         }
       } else if (verbose) {

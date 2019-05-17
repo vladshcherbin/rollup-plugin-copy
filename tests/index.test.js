@@ -108,6 +108,30 @@ describe('Copy', () => {
     expect(await fs.pathExists('build/css-2.css')).toBe(true)
   })
 
+  test('Multiple destinations', async () => {
+    await build({
+      targets: [{
+        src: [
+          'src/assets/asset-1.js',
+          'src/assets/css',
+          'src/assets/scss/scss-?(1).scss'
+        ],
+        dest: ['dist', 'build']
+      }]
+    })
+
+    expect(await fs.pathExists('dist/asset-1.js')).toBe(true)
+    expect(await fs.pathExists('dist/css')).toBe(true)
+    expect(await fs.pathExists('dist/css/css-1.css')).toBe(true)
+    expect(await fs.pathExists('dist/css/css-2.css')).toBe(true)
+    expect(await fs.pathExists('dist/scss-1.scss')).toBe(true)
+    expect(await fs.pathExists('build/asset-1.js')).toBe(true)
+    expect(await fs.pathExists('build/css')).toBe(true)
+    expect(await fs.pathExists('build/css/css-1.css')).toBe(true)
+    expect(await fs.pathExists('build/css/css-2.css')).toBe(true)
+    expect(await fs.pathExists('build/scss-1.scss')).toBe(true)
+  })
+
   test('Same target', async () => {
     await build({
       targets: [
