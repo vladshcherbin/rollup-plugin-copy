@@ -22,7 +22,7 @@ export default function copy(options = {}) {
     hook = 'buildEnd',
     targets = [],
     verbose = false,
-    ...rest
+    ...restPluginOptions
   } = options
 
   return {
@@ -36,21 +36,24 @@ export default function copy(options = {}) {
             throw new Error(`${stringify(target)} target must be an object`)
           }
 
-          if (!target.src || !target.dest) {
+          const { src, dest, ...restTargetOptions } = target
+
+          if (!src || !dest) {
             throw new Error(`${stringify(target)} target must have "src" and "dest" properties`)
           }
 
-          const matchedPaths = await globby(target.src, {
+          const matchedPaths = await globby(src, {
             expandDirectories: false,
             onlyFiles: false,
-            ...rest
+            ...restPluginOptions,
+            ...restTargetOptions
           })
 
           if (matchedPaths.length) {
             matchedPaths.forEach((matchedPath) => {
-              const generatedCopyTargets = Array.isArray(target.dest)
-                ? target.dest.map(dest => generateCopyTarget(matchedPath, dest))
-                : [generateCopyTarget(matchedPath, target.dest)]
+              const generatedCopyTargets = Array.isArray(dest)
+                ? dest.map(destination => generateCopyTarget(matchedPath, destination))
+                : [generateCopyTarget(matchedPath, dest)]
 
               copyTargets.push(...generatedCopyTargets)
             })
@@ -64,7 +67,7 @@ export default function copy(options = {}) {
         }
 
         for (const { src, dest } of copyTargets) {
-          await fs.copy(src, dest, rest)
+          await fs.copy(src, dest, restPluginOptions)
 
           if (verbose) {
             console.log(green(`  ${bold(src)} → ${bold(dest)}`))

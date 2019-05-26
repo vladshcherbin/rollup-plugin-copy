@@ -239,4 +239,12 @@ describe('Options', () => {
       transform: () => 'src/not-exist'
     })).rejects.toThrow('ENOENT: no such file or directory, stat \'src/not-exist\'')
   })
+
+  test('Rest target options', async () => {
+    await expect(build({
+      targets: [
+        { src: 'src/assets/asset-1.js', dest: 'dist', transform: () => 'src/not-exist' }
+      ]
+    })).rejects.toThrow('ENOENT: no such file or directory, stat \'src/not-exist\'')
+  })
 })
