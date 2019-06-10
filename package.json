@@ -6,6 +6,7 @@
   "repository": "vladshcherbin/rollup-plugin-copy",
   "main": "dist/index.commonjs.js",
   "module": "dist/index.module.js",
+  "types": "index.d.ts",
   "scripts": {
     "clean": "rimraf coverage dist",
     "build": "rollup -c",
@@ -15,6 +16,7 @@
     "test": "jest"
   },
   "dependencies": {
+    "@types/fs-extra": "^7.0.0",
     "colorette": "^1.0.7",
     "fs-extra": "^7.0.1",
     "globby": "^9.2.0",
@@ -37,6 +39,7 @@
   },
   "files": [
     "dist",
+    "index.d.ts",
     "readme.md"
   ],
   "keywords": [
