@@ -48,8 +48,12 @@
     "copy",
     "cp",
     "asset",
+    "assets",
     "file",
-    "folder"
+    "files",
+    "folder",
+    "folders",
+    "glob"
   ],
   "engines": {
     "node": ">=8.3"
