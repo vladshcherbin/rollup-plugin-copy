@@ -3,20 +3,16 @@
 [![Build Status](https://travis-ci.org/vladshcherbin/rollup-plugin-copy.svg?branch=master)](https://travis-ci.org/vladshcherbin/rollup-plugin-copy)
 [![Codecov](https://codecov.io/gh/vladshcherbin/rollup-plugin-copy/branch/master/graph/badge.svg)](https://codecov.io/gh/vladshcherbin/rollup-plugin-copy)
 
-Copy files and folders using Rollup.
-
-## About
-
-This plugin is useful when you want to copy some files or folders before bundling.
+Copy files and folders, with glob support.
 
 ## Installation
 
 ```bash
+# yarn
 yarn add rollup-plugin-copy -D
 
-# or
-
-npm install rollup-plugin-copy --save-dev
+# npm
+npm install rollup-plugin-copy -D
 ```
 
 ## Usage
@@ -34,10 +30,9 @@ export default {
   plugins: [
     copy({
       targets: [
-        'src/migrations',
-        'src/index.html'
-      ],
-      outputFolder: 'dist'
+        { src: 'src/index.html', dest: 'dist/public' },
+        { src: 'assets/images/**/*', dest: 'dist/public/images' }
+      ]
     })
   ]
 }
@@ -49,78 +44,110 @@ There are some useful options:
 
 #### targets
 
-An array or an object with paths of files and folders to be copied. Default is `[]`.
+Type: `Array` | Default: `[]`
+
+Array of targets to copy. A target is an object with properties:
+
+- **src** (`string` `Array`): Path or glob of what to copy
+- **dest** (`string` `Array`): One or more destinations where to copy
+- **rename** (`string` `Function`): Change destination file or folder name
+
+Each object should have **src** and **dest** properties, **rename** is optional.
+
+##### File
 
 ```js
 copy({
-  targets: ['src/assets', 'src/index.html'],
-  outputFolder: 'dist'
-})
-
-copy({
-  targets: {
-    'src/assets': 'dist/public/assets',
-    'src/index.html': 'dist/public/index.html',
-    'src/favicon.ico': ['dist/favicon.ico', 'build/favicon.ico'],
-    'src/images': ['dist/images', 'build/images']
-  }
+  targets: [{ src: 'src/index.html', dest: 'dist/public' }]
 })
 ```
 
-> Note: if an array, *outputFolder* is required to be set
-
-> Note: if an object, multiple destinations can be set using array syntax
-
-#### outputFolder
-
-Folder where files and folders will be copied. Required to be set when *targets* is an array.
+##### Folder
 
 ```js
 copy({
-  targets: ['src/assets', 'src/index.html'],
-  outputFolder: 'dist/public'
+  targets: [{ src: 'assets/images', dest: 'dist/public' }]
 })
 ```
 
-> Note: only used when *targets* is an array
+##### Glob
+
+```js
+copy({
+  targets: [{ src: ['assets/images/**/*', '!**/*.gif'], dest: 'dist/public/images' }]
+})
+```
+
+##### Multiple destinations
+
+```js
+copy({
+  targets: [{ src: 'src/index.html', dest: ['dist/public', 'build/public'] }]
+})
+```
+
+##### Rename with a string
+
+```js
+copy({
+  targets: [{ src: 'src/app.html', dest: 'dist/public', rename: 'index.html' }]
+})
+```
+
+##### Rename with a function
+
+```js
+copy({
+  targets: [{
+    src: 'assets/docs/*',
+    dest: 'dist/public/docs',
+    rename: (name, extension) => `${name}-v1.${extension}`
+  }]
+})
+```
 
 #### verbose
 
-Output copied files and folders to console. Default is `false`.
+Type: `boolean` | Default: `false`
+
+Output copied items to console.
 
 ```js
 copy({
-  targets: ['src/assets', 'src/index.html'],
-  outputFolder: 'dist',
+  targets: [{ src: 'assets/*', dest: 'dist/public' }],
   verbose: true
-})
-```
-
-#### warnOnNonExist
-
-Warn if target file or folder doesn't exist. Default is `false`.
-
-```js
-copy({
-  targets: ['src/assets', 'src/index.html'],
-  outputFolder: 'dist',
-  warnOnNonExist: true
 })
 ```
 
 #### hook
 
-Set which rollup hook the plugin should use. Default is `buildEnd`.
+Type: `string` | Default: `buildEnd`
+
+Rollup hook the plugin should use.
 
 ```js
 copy({
-  targets: ['src/assets', 'src/index.html'],
-  outputFolder: 'dist',
-  hook: 'generateBundle'
+  targets: [{ src: 'assets/*', dest: 'dist/public' }],
+  hook: 'buildStart'
 })
 ```
 
-All other options are passed directly to [fs-extra copy function](https://github.com/jprichardson/node-fs-extra/blob/7.0.0/docs/copy.md), which is used inside.
+#### copyOnce
+
+Type: `boolean` | Default: `false`
+
+Copy items once. Useful in watch mode.
+
+```js
+copy({
+  targets: [{ src: 'assets/*', dest: 'dist/public' }],
+  copyOnce: true
+})
+```
+
+All other options are passed to packages, used inside:
+  - [globby](https://github.com/sindresorhus/globby)
+  - [fs-extra copy function](https://github.com/jprichardson/node-fs-extra/blob/7.0.0/docs/copy.md)
 
 ## Original Author
 
