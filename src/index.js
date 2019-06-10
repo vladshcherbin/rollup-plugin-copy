@@ -29,15 +29,22 @@ function generateCopyTarget(src, dest, rename) {
 
 export default function copy(options = {}) {
   const {
+    copyOnce = false,
     hook = 'buildEnd',
     targets = [],
     verbose = false,
     ...restPluginOptions
   } = options
 
+  let copied = false
+
   return {
     name: 'copy',
     [hook]: async () => {
+      if (copyOnce && copied) {
+        return
+      }
+
       const copyTargets = []
 
       if (Array.isArray(targets) && targets.length) {
@@ -90,6 +97,8 @@ export default function copy(options = {}) {
       } else if (verbose) {
         console.log(yellow('no items to copy'))
       }
+
+      copied = true
     }
   }
 }

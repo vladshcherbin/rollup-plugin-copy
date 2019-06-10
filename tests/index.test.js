@@ -1,9 +1,14 @@
-import { rollup } from 'rollup'
+import { rollup, watch } from 'rollup'
 import fs from 'fs-extra'
+import replace from 'replace-in-file'
 import { bold, yellow, green } from 'colorette'
 import copy from '../src'
 
 process.chdir(`${__dirname}/fixtures`)
+
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms))
+}
 
 afterEach(async () => {
   await fs.remove('build')
@@ -287,6 +292,50 @@ describe('Options', () => {
     expect(await fs.pathExists('dist/css')).toBe(true)
     expect(await fs.pathExists('dist/css/css-1.css')).toBe(true)
     expect(await fs.pathExists('dist/css/css-2.css')).toBe(true)
+  })
+
+  test('Copy once', async () => {
+    const watcher = watch({
+      input: 'src/index.js',
+      output: {
+        dir: 'build',
+        format: 'esm'
+      },
+      plugins: [
+        copy({
+          targets: [
+            { src: 'src/assets/asset-1.js', dest: 'dist' }
+          ],
+          copyOnce: true
+        })
+      ]
+    })
+
+    await sleep(1000)
+
+    expect(await fs.pathExists('dist/asset-1.js')).toBe(true)
+
+    await fs.remove('dist')
+
+    expect(await fs.pathExists('dist/asset-1.js')).toBe(false)
+
+    await replace({
+      files: 'src/index.js',
+      from: 'hey',
+      to: 'ho'
+    })
+
+    await sleep(1000)
+
+    expect(await fs.pathExists('dist/asset-1.js')).toBe(false)
+
+    watcher.close()
+
+    await replace({
+      files: 'src/index.js',
+      from: 'ho',
+      to: 'hey'
+    })
   })
 
   test('Rest options', async () => {
