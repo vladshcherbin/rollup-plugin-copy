@@ -138,8 +138,7 @@ describe('Copy', () => {
         { src: 'src/assets/css', dest: 'dist' },
         { src: 'src/assets/css', dest: 'dist' },
         { src: ['src/assets/asset-1.js', 'src/assets/asset-1.js'], dest: 'build' }
-      ],
-      outputFolder: 'dist'
+      ]
     })
 
     expect(await fs.pathExists('dist/css')).toBe(true)
@@ -164,6 +163,65 @@ describe('Copy', () => {
     }))
       .rejects
       .toThrow('{ src: \'src/assets/asset-1.js\' } target must have "src" and "dest" properties')
+  })
+
+  test('Throw if target object "rename" property is of wrong type', async () => {
+    await expect(build({
+      targets: [
+        { src: 'src/assets/asset-1.js', dest: 'dist', rename: [] }
+      ]
+    }))
+      .rejects
+      .toThrow(
+        '{ src: \'src/assets/asset-1.js\', dest: \'dist\', rename: [] }'
+        + ' target\'s "rename" property must be a string or a function'
+      )
+  })
+
+  test('Rename target', async () => {
+    await build({
+      targets: [
+        { src: 'src/assets/asset-1.js', dest: 'dist', rename: 'asset-1-renamed.js' },
+        { src: 'src/assets/css', dest: 'dist', rename: 'css-renamed' },
+        { src: 'src/assets/css/*', dest: 'dist/css-multiple', rename: 'css-1.css' },
+        {
+          src: 'src/assets/asset-2.js',
+          dest: 'dist',
+          rename: (name, extension) => `${name}-renamed.${extension}`
+        },
+        {
+          src: 'src/assets/scss',
+          dest: 'dist',
+          rename: name => `${name}-renamed`
+        },
+        {
+          src: 'src/assets/scss/*',
+          dest: 'dist/scss-multiple',
+          rename: (name, extension) => (
+            extension
+              ? `${name}-renamed.${extension}`
+              : `${name}-renamed`
+          )
+        }
+      ]
+    })
+
+    expect(await fs.pathExists('dist/asset-1-renamed.js')).toBe(true)
+    expect(await fs.pathExists('dist/css-renamed')).toBe(true)
+    expect(await fs.pathExists('dist/css-renamed/css-1.css')).toBe(true)
+    expect(await fs.pathExists('dist/css-renamed/css-2.css')).toBe(true)
+    expect(await fs.pathExists('dist/css-multiple/css-1.css')).toBe(true)
+    expect(await fs.pathExists('dist/css-multiple/css-2.css')).toBe(false)
+    expect(await fs.pathExists('dist/asset-2-renamed.js')).toBe(true)
+    expect(await fs.pathExists('dist/scss-renamed')).toBe(true)
+    expect(await fs.pathExists('dist/scss-renamed/scss-1.scss')).toBe(true)
+    expect(await fs.pathExists('dist/scss-renamed/scss-2.scss')).toBe(true)
+    expect(await fs.pathExists('dist/scss-renamed/nested')).toBe(true)
+    expect(await fs.pathExists('dist/scss-renamed/nested/scss-3.scss')).toBe(true)
+    expect(await fs.pathExists('dist/scss-multiple/scss-1-renamed.scss')).toBe(true)
+    expect(await fs.pathExists('dist/scss-multiple/scss-2-renamed.scss')).toBe(true)
+    expect(await fs.pathExists('dist/scss-multiple/nested-renamed')).toBe(true)
+    expect(await fs.pathExists('dist/scss-multiple/nested-renamed/scss-3.scss')).toBe(true)
   })
 })
 

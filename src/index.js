@@ -2,18 +2,28 @@
 import path from 'path'
 import util from 'util'
 import fs from 'fs-extra'
-import globby from 'globby'
 import isObject from 'is-plain-object'
+import globby from 'globby'
 import { bold, green, yellow } from 'colorette'
 
-function stringify(target) {
-  return util.inspect(target, { breakLength: Infinity })
+function stringify(value) {
+  return util.inspect(value, { breakLength: Infinity })
 }
 
-function generateCopyTarget(src, dest) {
+function renameTarget(target, rename) {
+  const parsedPath = path.parse(target)
+
+  return typeof rename === 'string'
+    ? rename
+    : rename(parsedPath.name, parsedPath.ext.replace('.', ''))
+}
+
+function generateCopyTarget(src, dest, rename) {
+  const basename = path.basename(src)
+
   return {
     src,
-    dest: path.join(dest, path.basename(src))
+    dest: path.join(dest, rename ? renameTarget(basename, rename) : basename)
   }
 }
 
@@ -36,10 +46,14 @@ export default function copy(options = {}) {
             throw new Error(`${stringify(target)} target must be an object`)
           }
 
-          const { src, dest, ...restTargetOptions } = target
+          const { src, dest, rename, ...restTargetOptions } = target
 
           if (!src || !dest) {
             throw new Error(`${stringify(target)} target must have "src" and "dest" properties`)
+          }
+
+          if (rename && typeof rename !== 'string' && typeof rename !== 'function') {
+            throw new Error(`${stringify(target)} target's "rename" property must be a string or a function`)
           }
 
           const matchedPaths = await globby(src, {
@@ -52,8 +66,8 @@ export default function copy(options = {}) {
           if (matchedPaths.length) {
             matchedPaths.forEach((matchedPath) => {
               const generatedCopyTargets = Array.isArray(dest)
-                ? dest.map(destination => generateCopyTarget(matchedPath, destination))
-                : [generateCopyTarget(matchedPath, dest)]
+                ? dest.map(destination => generateCopyTarget(matchedPath, destination, rename))
+                : [generateCopyTarget(matchedPath, dest, rename)]
 
               copyTargets.push(...generatedCopyTargets)
             })
