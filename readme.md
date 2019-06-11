@@ -52,7 +52,7 @@ Array of targets to copy. A target is an object with properties:
 - **dest** (`string` `Array`): One or more destinations where to copy
 - **rename** (`string` `Function`): Change destination file or folder name
 
-Each object should have **src** and **dest** properties, **rename** is optional.
+Each object should have **src** and **dest** properties, **rename** is optional. [globby](https://github.com/sindresorhus/globby) is used inside, check it for glob pattern examples.
 
 ##### File
 
