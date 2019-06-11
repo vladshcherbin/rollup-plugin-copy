@@ -74,7 +74,34 @@ copy({
 
 ```js
 copy({
+  targets: [{ src: 'assets/*', dest: 'dist/public' }]
+})
+```
+
+##### Glob: multiple items
+
+```js
+copy({
+  targets: [{ src: ['src/index.html', 'src/styles.css', 'assets/images'], dest: 'dist/public' }]
+})
+```
+
+##### Glob: negated patterns
+
+```js
+copy({
   targets: [{ src: ['assets/images/**/*', '!**/*.gif'], dest: 'dist/public/images' }]
+})
+```
+
+##### Multiple targets
+
+```js
+copy({
+  targets: [
+    { src: 'src/index.html', dest: 'dist/public' },
+    { src: 'assets/images/**/*', dest: 'dist/public/images' }
+  ]
 })
 ```
 
