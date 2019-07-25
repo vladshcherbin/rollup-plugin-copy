@@ -31,6 +31,7 @@ export default {
     copy({
       targets: [
         { src: 'src/index.html', dest: 'dist/public' },
+        { src: ['assets/fonts/arial.woff', 'assets/fonts/arial.woff2'], dest: 'dist/public/fonts' },
         { src: 'assets/images/**/*', dest: 'dist/public/images' }
       ]
     })
