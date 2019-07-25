@@ -339,19 +339,23 @@ describe('Options', () => {
   })
 
   test('Rest options', async () => {
-    await expect(build({
+    await build({
       targets: [
         { src: 'src/assets/asset-1.js', dest: 'dist' }
       ],
-      transform: () => 'src/not-exist'
-    })).rejects.toThrow('ENOENT: no such file or directory, stat \'src/not-exist\'')
+      ignore: ['**/asset-1.js']
+    })
+
+    expect(await fs.pathExists('dist/asset-1.js')).toBe(false)
   })
 
   test('Rest target options', async () => {
-    await expect(build({
+    await build({
       targets: [
-        { src: 'src/assets/asset-1.js', dest: 'dist', transform: () => 'src/not-exist' }
+        { src: 'src/assets/asset-1.js', dest: 'dist', ignore: ['**/asset-1.js'] }
       ]
-    })).rejects.toThrow('ENOENT: no such file or directory, stat \'src/not-exist\'')
+    })
+
+    expect(await fs.pathExists('dist/asset-1.js')).toBe(false)
   })
 })
