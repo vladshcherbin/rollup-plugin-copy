@@ -151,12 +151,12 @@ copy({
 
 Type: `string` | Default: `buildEnd`
 
-Rollup hook the plugin should use.
+[Rollup hook](https://rollupjs.org/guide/en/#hooks) the plugin should use. By default, plugin runs when rollup has finished bundling, before bundle is written to disk.
 
 ```js
 copy({
   targets: [{ src: 'assets/*', dest: 'dist/public' }],
-  hook: 'buildStart'
+  hook: 'writeBundle'
 })
 ```
 
