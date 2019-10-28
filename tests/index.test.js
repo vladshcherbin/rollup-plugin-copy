@@ -228,6 +228,93 @@ describe('Copy', () => {
     expect(await fs.pathExists('dist/scss-multiple/nested-renamed')).toBe(true)
     expect(await fs.pathExists('dist/scss-multiple/nested-renamed/scss-3.scss')).toBe(true)
   })
+
+  test('Watches copied files in pre-build hook', async () => {
+    const watcher = watch({
+      input: 'src/index.js',
+      output: {
+        dir: 'build',
+        format: 'esm'
+      },
+      plugins: [
+        copy({
+          hook: 'buildStart',
+          targets: [
+            { src: 'src/assets/asset-1.js', dest: 'dist' }
+          ]
+        })
+      ]
+    })
+
+    await sleep(1000)
+
+    expect(await fs.pathExists('dist/asset-1.js')).toBe(true)
+
+    await fs.remove('dist')
+
+    expect(await fs.pathExists('dist/asset-1.js')).toBe(false)
+
+    await replace({
+      files: 'src/assets/asset-1.js',
+      from: 'asset1',
+      to: 'assetX'
+    })
+
+    await sleep(1000)
+
+    expect(await fs.pathExists('dist/asset-1.js')).toBe(true)
+
+    watcher.close()
+
+    await replace({
+      files: 'src/assets/asset-1.js',
+      from: 'assetX',
+      to: 'asset1'
+    })
+  })
+
+  test('Does not watch copied files in post-build hook', async () => {
+    const watcher = watch({
+      input: 'src/index.js',
+      output: {
+        dir: 'build',
+        format: 'esm'
+      },
+      plugins: [
+        copy({
+          targets: [
+            { src: 'src/assets/asset-1.js', dest: 'dist' }
+          ]
+        })
+      ]
+    })
+
+    await sleep(1000)
+
+    expect(await fs.pathExists('dist/asset-1.js')).toBe(true)
+
+    await fs.remove('dist')
+
+    expect(await fs.pathExists('dist/asset-1.js')).toBe(false)
+
+    await replace({
+      files: 'src/assets/asset-1.js',
+      from: 'asset1',
+      to: 'assetX'
+    })
+
+    await sleep(1000)
+
+    expect(await fs.pathExists('dist/asset-1.js')).toBe(false)
+
+    watcher.close()
+
+    await replace({
+      files: 'src/assets/asset-1.js',
+      from: 'assetX',
+      to: 'asset1'
+    })
+  })
 })
 
 describe('Options', () => {

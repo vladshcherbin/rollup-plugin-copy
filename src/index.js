@@ -40,7 +40,7 @@ export default function copy(options = {}) {
 
   return {
     name: 'copy',
-    [hook]: async () => {
+    async [hook]() {
       if (copyOnce && copied) {
         return
       }
@@ -88,6 +88,10 @@ export default function copy(options = {}) {
         }
 
         for (const { src, dest } of copyTargets) {
+          try {
+            this.addWatchFile(src)
+          } catch { /* Cannot call addWatchFile after the build has finished. */ } 
+
           await fs.copy(src, dest, restPluginOptions)
 
           if (verbose) {
