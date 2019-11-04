@@ -61,7 +61,6 @@ function watchFiles(targets, verbose, restPluginOptions) {
     const { dest, rename } = target
 
     async function onChange(matchedPath) {
-      console.log('file changed')
       const copyTargets = generateCopyTargets(matchedPath, dest, rename)
       await copyFiles(copyTargets, verbose, restPluginOptions)
     }
@@ -73,7 +72,6 @@ function watchFiles(targets, verbose, restPluginOptions) {
   })
 
   process.on('SIGINT', async () => {
-    console.log('CLOSE WATCHERS', watchers)
     await Promise.all(watchers.forEach(watcher => watcher.close()))
   })
 }
@@ -139,7 +137,6 @@ export default function copy(options = {}) {
         }
       }
 
-      console.log('copying all files')
       await copyFiles(copyTargets, verbose, restPluginOptions)
 
       if (!copied && !copyOnce && process.env.ROLLUP_WATCH) {
