@@ -53,13 +53,13 @@ async function copyFiles(copyTargets, verbose, restPluginOptions) {
 }
 
 function watchFiles(targets, verbose, restPluginOptions) {
-  targets.forEach(({ src, dest, rename }) => {
+  return targets.map(({ src, dest, rename }) => {
     async function onChange(matchedPath) {
       const copyTargets = generateCopyTargets(matchedPath, dest, rename)
       await copyFiles(copyTargets, verbose, restPluginOptions)
     }
 
-    chokidar.watch(src, { ignoreInitial: true })
+    return chokidar.watch(src, { ignoreInitial: true })
       .on('change', onChange)
       .on('add', onChange)
   })
@@ -95,6 +95,7 @@ export default function copy(options = {}) {
   } = options
 
   let copied = false
+  let watchers = []
 
   verifyTargets(targets)
 
@@ -128,11 +129,14 @@ export default function copy(options = {}) {
 
       await copyFiles(copyTargets, verbose, restPluginOptions)
 
-      if (!copied && !copyOnce && process.env.ROLLUP_WATCH) {
-        watchFiles(targets, verbose, restPluginOptions)
+      if (!copied && !copyOnce && process.env.ROLLUP_WATCH === 'true') {
+        watchers = watchFiles(targets, verbose, restPluginOptions)
       }
 
       copied = true
+    },
+    _closeWatchers: async () => { // For unit tests
+      await Promise.all(watchers.map(watcher => watcher.close()))
     }
   }
 }
