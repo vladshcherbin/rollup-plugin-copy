@@ -52,11 +52,11 @@ async function copyFiles(copyTargets, verbose, copyOptions) {
   }
 }
 
-function watchFiles(targets, verbose, restPluginOptions) {
+function watchFiles(targets, verbose, copyOptions) {
   return targets.map(({ src, dest, rename }) => {
     async function onChange(matchedPath) {
       const copyTargets = generateCopyTargets(matchedPath, dest, rename)
-      await copyFiles(copyTargets, verbose, restPluginOptions)
+      await copyFiles(copyTargets, verbose, copyOptions)
     }
 
     return chokidar.watch(src, { ignoreInitial: true })
