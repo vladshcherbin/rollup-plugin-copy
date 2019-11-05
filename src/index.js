@@ -34,14 +34,14 @@ function generateCopyTargets(src, dest, rename) {
     : [generateCopyTarget(src, dest, rename)]
 }
 
-async function copyFiles(copyTargets, verbose, restPluginOptions) {
+async function copyFiles(copyTargets, verbose, copyOptions) {
   if (Array.isArray(copyTargets) && copyTargets.length) {
     if (verbose) {
       console.log(green('copied:'))
     }
 
     for (const { src, dest } of copyTargets) {
-      await fs.copy(src, dest, restPluginOptions)
+      await fs.copy(src, dest, copyOptions)
 
       if (verbose) {
         console.log(green(`  ${bold(src)} → ${bold(dest)}`))
