@@ -2,6 +2,7 @@ import { rollup, watch } from 'rollup'
 import fs from 'fs-extra'
 import replace from 'replace-in-file'
 import { bold, yellow, green } from 'colorette'
+import { join } from 'path'
 import copy from '../src'
 
 process.chdir(`${__dirname}/fixtures`)
@@ -16,12 +17,14 @@ afterEach(async () => {
 })
 
 async function build(options) {
+  const copyPlugin = copy(options)
   await rollup({
     input: 'src/index.js',
     plugins: [
-      copy(options)
+      copyPlugin
     ]
   })
+  return copyPlugin
 }
 
 describe('Copy', () => {
@@ -230,6 +233,137 @@ describe('Copy', () => {
   })
 })
 
+describe('Watching', () => {
+  test('Does not watch target files when watch mode disabled', async () => {
+    await build({
+      targets: [
+        { src: 'src/assets/asset-1.js', dest: 'dist' }
+      ]
+    })
+
+    expect(await fs.pathExists('dist/asset-1.js')).toBe(true)
+    await fs.remove('dist')
+    expect(await fs.pathExists('dist/asset-1.js')).toBe(false)
+
+    await replace({
+      files: 'src/assets/asset-1.js',
+      from: 'asset1',
+      to: 'assetX'
+    })
+
+    await sleep(1000)
+
+    expect(await fs.pathExists('dist/asset-1.js')).toBe(false)
+
+    await replace({
+      files: 'src/assets/asset-1.js',
+      from: 'assetX',
+      to: 'asset1'
+    })
+  })
+
+  test('Does not watch target files when watch mode and copyOnce enabled', async () => {
+    process.env.ROLLUP_WATCH = 'true'
+    await build({
+      targets: [
+        { src: 'src/assets/asset-1.js', dest: 'dist' }
+      ],
+      copyOnce: true
+    })
+    delete process.env.ROLLUP_WATCH
+
+    expect(await fs.pathExists('dist/asset-1.js')).toBe(true)
+    await fs.remove('dist')
+    expect(await fs.pathExists('dist/asset-1.js')).toBe(false)
+
+    await replace({
+      files: 'src/assets/asset-1.js',
+      from: 'asset1',
+      to: 'assetX'
+    })
+
+    await sleep(1000)
+
+    expect(await fs.pathExists('dist/asset-1.js')).toBe(false)
+
+    await replace({
+      files: 'src/assets/asset-1.js',
+      from: 'assetX',
+      to: 'asset1'
+    })
+  })
+
+  test('Watches target files when watch mode enabled', async () => {
+    process.env.ROLLUP_WATCH = 'true'
+    const copyPlugin = await build({
+      targets: [
+        { src: 'src/assets/asset-1.js', dest: 'dist' }
+      ]
+    })
+    delete process.env.ROLLUP_WATCH
+
+    expect(await fs.pathExists('dist/asset-1.js')).toBe(true)
+    await fs.remove('dist')
+    expect(await fs.pathExists('dist/asset-1.js')).toBe(false)
+
+    await replace({
+      files: 'src/assets/asset-1.js',
+      from: 'asset1',
+      to: 'assetX'
+    })
+
+    await sleep(1000)
+
+    expect(await fs.pathExists('dist/asset-1.js')).toBe(true)
+
+    // eslint-disable-next-line no-underscore-dangle
+    await copyPlugin._closeWatchers()
+
+    await replace({
+      files: 'src/assets/asset-1.js',
+      from: 'assetX',
+      to: 'asset1'
+    })
+  })
+
+  test('Watches and copies multiple targets from same file', async () => {
+    process.env.ROLLUP_WATCH = 'true'
+    const copyPlugin = await build({
+      targets: [
+        { src: 'src/assets/asset-1.js', dest: 'dist' },
+        { src: 'src/assets/asset-1.js', dest: 'dist/2' }
+      ]
+    })
+    delete process.env.ROLLUP_WATCH
+
+    expect(await fs.pathExists('dist/asset-1.js')).toBe(true)
+    expect(await fs.pathExists('dist/2/asset-1.js')).toBe(true)
+    await fs.remove('dist')
+    expect(await fs.pathExists('dist/asset-1.js')).toBe(false)
+    expect(await fs.pathExists('dist/2/asset-1.js')).toBe(false)
+
+    await replace({
+      files: 'src/assets/asset-1.js',
+      from: 'asset1',
+      to: 'assetX'
+    })
+
+    await sleep(1000)
+
+    expect(await fs.pathExists('dist/asset-1.js')).toBe(true)
+    expect(await fs.pathExists('dist/2/asset-1.js')).toBe(true)
+
+    // eslint-disable-next-line no-underscore-dangle
+    await copyPlugin._closeWatchers()
+
+    await replace({
+      files: 'src/assets/asset-1.js',
+      from: 'assetX',
+      to: 'asset1'
+    })
+  })
+})
+
 describe('Options', () => {
   /* eslint-disable no-console */
   test('Verbose', async () => {
@@ -251,16 +385,16 @@ describe('Options', () => {
     expect(console.log).toHaveBeenCalledTimes(5)
     expect(console.log).toHaveBeenCalledWith(green('copied:'))
     expect(console.log).toHaveBeenCalledWith(
-      green(`  ${bold('src/assets/asset-1.js')} → ${bold('dist/asset-1.js')}`)
+      green(`  ${bold('src/assets/asset-1.js')} → ${bold(join('dist', 'asset-1.js'))}`)
     )
     expect(console.log).toHaveBeenCalledWith(
-      green(`  ${bold('src/assets/css/css-1.css')} → ${bold('dist/css-1.css')}`)
+      green(`  ${bold('src/assets/css/css-1.css')} → ${bold(join('dist', 'css-1.css'))}`)
     )
     expect(console.log).toHaveBeenCalledWith(
-      green(`  ${bold('src/assets/css/css-2.css')} → ${bold('dist/css-2.css')}`)
+      green(`  ${bold('src/assets/css/css-2.css')} → ${bold(join('dist', 'css-2.css'))}`)
     )
     expect(console.log).toHaveBeenCalledWith(
-      green(`  ${bold('src/assets/scss')} → ${bold('dist/scss')}`)
+      green(`  ${bold('src/assets/scss')} → ${bold(join('dist', 'scss'))}`)
     )
   })
 
