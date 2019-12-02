@@ -160,6 +160,19 @@ copy({
 })
 ```
 
+#### transfrom
+
+Type: `buffer => buffer | string | Uint8Array` | Default: `undefined`
+
+Pass a function to transform the files content before beign copied by the plugin. It does not change the source files contents, only the destination ones.
+
+```js
+copy({
+  targets: [{ src: 'assets/*', dest: 'dist/public' }],
+  hook: 'writeBundle'
+})
+```
+
 #### copyOnce
 
 Type: `boolean` | Default: `false`

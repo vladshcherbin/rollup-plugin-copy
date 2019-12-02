@@ -277,6 +277,45 @@ describe('Options', () => {
     expect(console.log).toHaveBeenCalledTimes(1)
     expect(console.log).toHaveBeenCalledWith(yellow('no items to copy'))
   })
+
+  test('Verbose with transform', async () => {
+    console.log = jest.fn()
+
+    await build({
+      targets: [{
+        src: ['src/assets/asset-transform.css'],
+        dest: 'dist/css',
+        transform: (c) => c.toString().replace('__to_be_transformed__', 'blue')
+      }],
+      verbose: true
+    })
+
+    expect(console.log).toHaveBeenCalledTimes(2)
+    expect(console.log).toHaveBeenCalledWith(green('copied:'))
+    expect(console.log).toHaveBeenCalledWith(
+      green(`  ${bold('src/assets/asset-transform.css')} → ${bold('dist/css/asset-transform.css')} (transformed)`)
+    )
+  })
+
+  test('Verbose with transform on directory', async () => {
+    console.log = jest.fn()
+
+    await build({
+      targets: [{
+        src: ['src/assets'],
+        dest: 'dist/css',
+        transform: (c) => c.toString().replace('__to_be_transformed__', 'blue')
+      }],
+      verbose: true
+    })
+
+    expect(console.log).toHaveBeenCalledTimes(3)
+    expect(console.log).toHaveBeenCalledWith(yellow('`transform` option only works on files, not on directories (received src/assets)'))
+    expect(console.log).toHaveBeenCalledWith(green('copied:'))
+    expect(console.log).toHaveBeenCalledWith(
+      green(`  ${bold('src/assets')} → ${bold('dist/css/assets')}`)
+    )
+  })
   /* eslint-enable no-console */
 
   test('Hook', async () => {
@@ -292,6 +331,21 @@ describe('Options', () => {
     expect(await fs.pathExists('dist/css')).toBe(true)
     expect(await fs.pathExists('dist/css/css-1.css')).toBe(true)
     expect(await fs.pathExists('dist/css/css-2.css')).toBe(true)
+  })
+
+  test('Transform', async () => {
+    await build({
+      targets: [{
+        src: ['src/assets/asset-transform.css'],
+        dest: 'dist/css',
+        transform: (c) => c.toString().replace('__to_be_transformed__', 'blue')
+      }]
+    })
+
+    expect(await fs.pathExists('dist/css/asset-transform.css')).toBe(true)
+    expect(await fs.readFile('dist/css/asset-transform.css', 'utf-8')).not.toEqual(
+      expect.stringMatching('__to_be_transformed__')
+    )
   })
 
   test('Copy once', async () => {
