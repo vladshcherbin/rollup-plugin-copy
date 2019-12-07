@@ -173,6 +173,19 @@ copy({
 })
 ```
 
+#### makeLink
+
+Type: `boolean` | Default: `false`
+
+Makes hardlink of files instead of copying them. Alternative to watch mode.
+
+```js
+copy({
+  targets: [{ src: 'assets/*', dest: 'dist/public' }],
+  makeLink: true
+})
+```
+
 All other options are passed to packages, used inside:
   - [globby](https://github.com/sindresorhus/globby)
   - [fs-extra copy function](https://github.com/jprichardson/node-fs-extra/blob/7.0.0/docs/copy.md)

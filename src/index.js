@@ -33,6 +33,7 @@ export default function copy(options = {}) {
     hook = 'buildEnd',
     targets = [],
     verbose = false,
+    makeLink = false,
     ...restPluginOptions
   } = options
 
@@ -88,7 +89,11 @@ export default function copy(options = {}) {
         }
 
         for (const { src, dest } of copyTargets) {
-          await fs.copy(src, dest, restPluginOptions)
+          if (makeLink) {
+            await fs.ensureLink(src, dest)
+          } else {
+            await fs.copy(src, dest, restPluginOptions)
+          }
 
           if (verbose) {
             console.log(green(`  ${bold(src)} → ${bold(dest)}`))

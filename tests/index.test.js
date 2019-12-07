@@ -152,6 +152,18 @@ describe('Copy', () => {
     expect(await fs.pathExists('build/asset-1.js')).toBe(true)
   })
 
+  test('Make Hardlink', async () => {
+    await build({
+      targets: [
+        { src: 'src/assets/css', dest: 'dist', makeLink: true }
+      ]
+    })
+
+    expect(await fs.pathExists('dist/css')).toBe(true)
+    expect(await fs.pathExists('dist/css/css-1.css')).toBe(true)
+    expect(await fs.pathExists('dist/css/css-2.css')).toBe(true)
+  })
+
   test('Throw if target is not an object', async () => {
     await expect(build({
       targets: [

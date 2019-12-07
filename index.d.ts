@@ -43,6 +43,12 @@ interface CopyOptions extends globby.GlobbyOptions, fs.CopyOptions {
      * @default false
      */
     readonly verbose?: boolean;
+
+    /**
+     * Make hardlinks instead of copying.
+     * @default false
+     */
+    readonly makeLink?: boolean;
 }
 
 /**
