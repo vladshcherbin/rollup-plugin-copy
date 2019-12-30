@@ -75,6 +75,22 @@ describe('Copy', () => {
     expect(await fs.pathExists('dist/scss/nested/scss-3.scss')).toBe(true)
   })
 
+  test('Files Keeping the directory structure', async () => {
+    await build({
+      targets: [{
+        src: [
+          'src/assets/asset-1.js',
+          'src/assets/asset-2.js'
+        ],
+        dest: 'dist'
+      }],
+      flatten: false
+    })
+
+    expect(await fs.pathExists('dist/assets/asset-1.js')).toBe(true)
+    expect(await fs.pathExists('dist/assets/asset-2.js')).toBe(true)
+  })
+
   test('Glob', async () => {
     await build({
       targets: [{
