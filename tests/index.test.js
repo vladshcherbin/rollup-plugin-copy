@@ -7,7 +7,7 @@ import copy from '../src'
 process.chdir(`${__dirname}/fixtures`)
 
 function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms))
+  return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
 afterEach(async () => {
@@ -197,7 +197,7 @@ describe('Copy', () => {
         {
           src: 'src/assets/scss',
           dest: 'dist',
-          rename: name => `${name}-renamed`
+          rename: (name) => `${name}-renamed`
         },
         {
           src: 'src/assets/scss/*',

@@ -77,7 +77,7 @@ export default function copy(options = {}) {
           if (matchedPaths.length) {
             matchedPaths.forEach((matchedPath) => {
               const generatedCopyTargets = Array.isArray(dest)
-                ? dest.map(destination => generateCopyTarget(
+                ? dest.map((destination) => generateCopyTarget(
                   matchedPath,
                   destination,
                   { flatten, rename }
