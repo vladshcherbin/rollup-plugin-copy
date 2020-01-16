@@ -177,11 +177,11 @@ copy({
 
 Type: `boolean` | Default: `true`
 
-Preserve the directory structure copying the files. Note: Disabling this mode you can't use the rename option of the targets.
+Preserve the directory structure of copied files.
 
 ```js
 copy({
-  targets: [{ src: 'assets/**/*.html', dest: 'dist/public' }],
+  targets: [{ src: 'assets/**/*', dest: 'dist/public' }],
   flatten: false
 })
 ```

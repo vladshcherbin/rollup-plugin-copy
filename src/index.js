@@ -18,38 +18,29 @@ function renameTarget(target, rename) {
     : rename(parsedPath.name, parsedPath.ext.replace('.', ''))
 }
 
-function generateFlattenedCopyTarget(src, dest, rename) {
-  const basename = path.basename(src)
-  return {
-    src,
-    dest: path.join(dest, rename ? renameTarget(basename, rename) : basename)
-  }
-}
-
-function generateCopyTarget(src, dest) {
-  const root = src.split('/')[0]
+function generateCopyTarget(src, dest, { flatten, rename }) {
+  const { dir, base } = path.parse(src)
+  const destinationFolder = (flatten || (!flatten && !dir))
+    ? dest
+    : dir.replace(dir.split('/')[0], dest)
 
   return {
     src,
-    dest: src.replace(root, dest)
+    dest: path.join(destinationFolder, rename ? renameTarget(base, rename) : base)
   }
 }
 
 export default function copy(options = {}) {
   const {
     copyOnce = false,
+    flatten = true,
     hook = 'buildEnd',
     targets = [],
     verbose = false,
-    flatten = true,
     ...restPluginOptions
   } = options
 
   let copied = false
-  let generateCopy = generateFlattenedCopyTarget
-  if (!flatten) {
-    generateCopy = generateCopyTarget
-  }
 
   return {
     name: 'copy',
@@ -86,12 +77,12 @@ export default function copy(options = {}) {
           if (matchedPaths.length) {
             matchedPaths.forEach((matchedPath) => {
               const generatedCopyTargets = Array.isArray(dest)
-                ? dest.map(destination => generateCopy(
+                ? dest.map(destination => generateCopyTarget(
                   matchedPath,
                   destination,
-                  rename
+                  { flatten, rename }
                 ))
-                : [generateCopy(matchedPath, dest, rename)]
+                : [generateCopyTarget(matchedPath, dest, { flatten, rename })]
 
               copyTargets.push(...generatedCopyTargets)
             })

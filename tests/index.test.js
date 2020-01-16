@@ -75,22 +75,6 @@ describe('Copy', () => {
     expect(await fs.pathExists('dist/scss/nested/scss-3.scss')).toBe(true)
   })
 
-  test('Files Keeping the directory structure', async () => {
-    await build({
-      targets: [{
-        src: [
-          'src/assets/asset-1.js',
-          'src/assets/asset-2.js'
-        ],
-        dest: 'dist'
-      }],
-      flatten: false
-    })
-
-    expect(await fs.pathExists('dist/assets/asset-1.js')).toBe(true)
-    expect(await fs.pathExists('dist/assets/asset-2.js')).toBe(true)
-  })
-
   test('Glob', async () => {
     await build({
       targets: [{
@@ -352,6 +336,36 @@ describe('Options', () => {
       from: 'ho',
       to: 'hey'
     })
+  })
+
+  test('Flatten', async () => {
+    await build({
+      targets: [{
+        src: [
+          'src/assets/asset-1.js',
+          'src/assets/asset-2.js'
+        ],
+        dest: 'dist'
+      },
+      {
+        src: 'src/**/*.css',
+        dest: 'dist'
+      },
+      {
+        src: '**/*.scss',
+        dest: 'dist',
+        rename: (name, extension) => `${name}-renamed.${extension}`
+      }],
+      flatten: false
+    })
+
+    expect(await fs.pathExists('dist/assets/asset-1.js')).toBe(true)
+    expect(await fs.pathExists('dist/assets/asset-2.js')).toBe(true)
+    expect(await fs.pathExists('dist/assets/css/css-1.css')).toBe(true)
+    expect(await fs.pathExists('dist/assets/css/css-2.css')).toBe(true)
+    expect(await fs.pathExists('dist/assets/scss/scss-1-renamed.scss')).toBe(true)
+    expect(await fs.pathExists('dist/assets/scss/scss-2-renamed.scss')).toBe(true)
+    expect(await fs.pathExists('dist/assets/scss/nested/scss-3-renamed.scss')).toBe(true)
   })
 
   test('Rest options', async () => {
