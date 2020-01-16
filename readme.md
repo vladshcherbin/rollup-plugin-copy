@@ -173,6 +173,19 @@ copy({
 })
 ```
 
+#### flatten
+
+Type: `boolean` | Default: `true`
+
+Preserve the directory structure of copied files.
+
+```js
+copy({
+  targets: [{ src: 'assets/**/*', dest: 'dist/public' }],
+  flatten: false
+})
+```
+
 All other options are passed to packages, used inside:
   - [globby](https://github.com/sindresorhus/globby)
   - [fs-extra copy function](https://github.com/jprichardson/node-fs-extra/blob/7.0.0/docs/copy.md)
