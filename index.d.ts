@@ -27,6 +27,12 @@ interface CopyOptions extends globby.GlobbyOptions, fs.CopyOptions {
     readonly copyOnce?: boolean;
 
     /**
+     * Remove the directory structure of copied files.
+     * @default true
+     */
+    readonly flatten?: boolean;
+
+    /**
      * Rollup hook the plugin should use.
      * @default 'buildEnd'
      */
