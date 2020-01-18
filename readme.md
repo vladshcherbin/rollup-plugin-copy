@@ -177,7 +177,7 @@ copy({
 
 Type: `boolean` | Default: `true`
 
-Preserve the directory structure of copied files.
+Remove the directory structure of copied files.
 
 ```js
 copy({
