@@ -52,8 +52,9 @@ Array of targets to copy. A target is an object with properties:
 - **src** (`string` `Array`): Path or glob of what to copy
 - **dest** (`string` `Array`): One or more destinations where to copy
 - **rename** (`string` `Function`): Change destination file or folder name
+- **transform** (`Function`): Modify file contents
 
-Each object should have **src** and **dest** properties, **rename** is optional. [globby](https://github.com/sindresorhus/globby) is used inside, check it for [glob pattern](https://github.com/sindresorhus/globby#globbing-patterns) examples.
+Each object should have **src** and **dest** properties, **rename** and **transform** are optional. [globby](https://github.com/sindresorhus/globby) is used inside, check it for [glob pattern](https://github.com/sindresorhus/globby#globbing-patterns) examples.
 
 ##### File
 
@@ -134,6 +135,18 @@ copy({
 })
 ```
 
+##### Transform file contents
+
+```js
+copy({
+  targets: [{
+    src: 'src/index.html',
+    dest: 'dist/public',
+    transform: (contents) => contents.toString().replace('__SCRIPT__', 'app.js')
+  }]
+})
+```
+
 #### verbose
 
 Type: `boolean` | Default: `false`
@@ -152,19 +165,6 @@ copy({
 Type: `string` | Default: `buildEnd`
 
 [Rollup hook](https://rollupjs.org/guide/en/#hooks) the plugin should use. By default, plugin runs when rollup has finished bundling, before bundle is written to disk.
-
-```js
-copy({
-  targets: [{ src: 'assets/*', dest: 'dist/public' }],
-  hook: 'writeBundle'
-})
-```
-
-#### transfrom
-
-Type: `buffer => buffer | string | Uint8Array` | Default: `undefined`
-
-Pass a function to transform the files content before beign copied by the plugin. It does not change the source files contents, only the destination ones.
 
 ```js
 copy({
