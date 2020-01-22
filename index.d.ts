@@ -17,6 +17,11 @@ interface Target extends globby.GlobbyOptions {
      * Change destination file or folder name.
      */
     readonly rename?: string | Function;
+
+    /**
+     * Modify file contents.
+     */
+    readonly transform?: Function;
 }
 
 interface CopyOptions extends globby.GlobbyOptions, fs.CopyOptions {
