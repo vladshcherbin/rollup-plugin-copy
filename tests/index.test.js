@@ -1,28 +1,34 @@
 import { rollup, watch } from 'rollup'
 import fs from 'fs-extra'
 import replace from 'replace-in-file'
-import { bold, yellow, green } from 'colorette'
+import { bold, green, yellow, options } from 'colorette'
 import copy from '../src'
 
 process.chdir(`${__dirname}/fixtures`)
 
+options.enabled = true
+
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms))
+}
+
+function readFile(path) {
+  return fs.readFile(path, 'utf-8')
+}
+
+async function build(pluginOptions) {
+  await rollup({
+    input: 'src/index.js',
+    plugins: [
+      copy(pluginOptions)
+    ]
+  })
 }
 
 afterEach(async () => {
   await fs.remove('build')
   await fs.remove('dist')
 })
-
-async function build(options) {
-  await rollup({
-    input: 'src/index.js',
-    plugins: [
-      copy(options)
-    ]
-  })
-}
 
 describe('Copy', () => {
   test('No config passed', async () => {
@@ -228,11 +234,46 @@ describe('Copy', () => {
     expect(await fs.pathExists('dist/scss-multiple/nested-renamed')).toBe(true)
     expect(await fs.pathExists('dist/scss-multiple/nested-renamed/scss-3.scss')).toBe(true)
   })
+
+  test('Throw if transform target is not a file', async () => {
+    await expect(build({
+      targets: [{
+        src: 'src/assets/css',
+        dest: 'dist',
+        transform: (contents) => contents.toString().replace('blue', 'red')
+      }]
+    })).rejects.toThrow('"transform" option works only on files: \'src/assets/css\' must be a file')
+  })
+
+  test('Transform target', async () => {
+    await build({
+      targets: [{
+        src: 'src/assets/css/css-1.css',
+        dest: ['dist', 'build'],
+        transform: (contents) => contents.toString().replace('blue', 'red')
+      }, {
+        src: 'src/assets/scss/**/*.scss',
+        dest: 'dist',
+        transform: (contents) => contents.toString().replace('background-color', 'color')
+      }]
+    })
+
+    expect(await fs.pathExists('dist/css-1.css')).toBe(true)
+    expect(await readFile('dist/css-1.css')).toEqual(expect.stringContaining('red'))
+    expect(await fs.pathExists('build/css-1.css')).toBe(true)
+    expect(await readFile('build/css-1.css')).toEqual(expect.stringContaining('red'))
+    expect(await fs.pathExists('dist/scss-1.scss')).toBe(true)
+    expect(await readFile('dist/scss-1.scss')).toEqual(expect.not.stringContaining('background-color'))
+    expect(await fs.pathExists('dist/scss-2.scss')).toBe(true)
+    expect(await readFile('dist/scss-2.scss')).toEqual(expect.not.stringContaining('background-color'))
+    expect(await fs.pathExists('dist/scss-3.scss')).toBe(true)
+    expect(await readFile('dist/scss-3.scss')).toEqual(expect.not.stringContaining('background-color'))
+  })
 })
 
 describe('Options', () => {
   /* eslint-disable no-console */
-  test('Verbose', async () => {
+  test('Verbose, copy files', async () => {
     console.log = jest.fn()
 
     await build({
@@ -250,21 +291,13 @@ describe('Options', () => {
 
     expect(console.log).toHaveBeenCalledTimes(5)
     expect(console.log).toHaveBeenCalledWith(green('copied:'))
-    expect(console.log).toHaveBeenCalledWith(
-      green(`  ${bold('src/assets/asset-1.js')} → ${bold('dist/asset-1.js')}`)
-    )
-    expect(console.log).toHaveBeenCalledWith(
-      green(`  ${bold('src/assets/css/css-1.css')} → ${bold('dist/css-1.css')}`)
-    )
-    expect(console.log).toHaveBeenCalledWith(
-      green(`  ${bold('src/assets/css/css-2.css')} → ${bold('dist/css-2.css')}`)
-    )
-    expect(console.log).toHaveBeenCalledWith(
-      green(`  ${bold('src/assets/scss')} → ${bold('dist/scss')}`)
-    )
+    expect(console.log).toHaveBeenCalledWith(green(`  ${bold('src/assets/asset-1.js')} → ${bold('dist/asset-1.js')}`))
+    expect(console.log).toHaveBeenCalledWith(green(`  ${bold('src/assets/css/css-1.css')} → ${bold('dist/css-1.css')}`))
+    expect(console.log).toHaveBeenCalledWith(green(`  ${bold('src/assets/css/css-2.css')} → ${bold('dist/css-2.css')}`))
+    expect(console.log).toHaveBeenCalledWith(green(`  ${bold('src/assets/scss')} → ${bold('dist/scss')}`))
   })
 
-  test('Verbose, no items to copy', async () => {
+  test('Verbose, no files to copy', async () => {
     console.log = jest.fn()
 
     await build({
@@ -276,6 +309,51 @@ describe('Options', () => {
 
     expect(console.log).toHaveBeenCalledTimes(1)
     expect(console.log).toHaveBeenCalledWith(yellow('no items to copy'))
+  })
+
+  test('Verbose, rename files', async () => {
+    console.log = jest.fn()
+
+    await build({
+      targets: [
+        { src: 'src/assets/asset-1.js', dest: 'dist', rename: 'asset-1-renamed.js' },
+        {
+          src: 'src/assets/scss/*',
+          dest: 'dist/scss-multiple',
+          rename: (name, extension) => (
+            extension
+              ? `${name}-renamed.${extension}`
+              : `${name}-renamed`
+          )
+        }
+      ],
+      verbose: true
+    })
+
+    expect(console.log).toHaveBeenCalledTimes(5)
+    expect(console.log).toHaveBeenCalledWith(green('copied:'))
+    expect(console.log).toHaveBeenCalledWith(`${green(`  ${bold('src/assets/asset-1.js')} → ${bold('dist/asset-1-renamed.js')}`)} ${yellow('[R]')}`)
+    expect(console.log).toHaveBeenCalledWith(`${green(`  ${bold('src/assets/scss/scss-1.scss')} → ${bold('dist/scss-multiple/scss-1-renamed.scss')}`)} ${yellow('[R]')}`)
+    expect(console.log).toHaveBeenCalledWith(`${green(`  ${bold('src/assets/scss/scss-2.scss')} → ${bold('dist/scss-multiple/scss-2-renamed.scss')}`)} ${yellow('[R]')}`)
+    expect(console.log).toHaveBeenCalledWith(`${green(`  ${bold('src/assets/scss/nested')} → ${bold('dist/scss-multiple/nested-renamed')}`)} ${yellow('[R]')}`)
+  })
+
+  test('Verbose, transform files', async () => {
+    console.log = jest.fn()
+
+    await build({
+      targets: [{
+        src: 'src/assets/css/css-*.css',
+        dest: 'dist',
+        transform: (contents) => contents.toString().replace('background-color', 'color')
+      }],
+      verbose: true
+    })
+
+    expect(console.log).toHaveBeenCalledTimes(3)
+    expect(console.log).toHaveBeenCalledWith(green('copied:'))
+    expect(console.log).toHaveBeenCalledWith(`${green(`  ${bold('src/assets/css/css-1.css')} → ${bold('dist/css-1.css')}`)} ${yellow('[T]')}`)
+    expect(console.log).toHaveBeenCalledWith(`${green(`  ${bold('src/assets/css/css-2.css')} → ${bold('dist/css-2.css')}`)} ${yellow('[T]')}`)
   })
   /* eslint-enable no-console */
 
