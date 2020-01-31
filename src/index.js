@@ -57,84 +57,74 @@ export default function copy(options = {}) {
 
   return {
     name: 'copy',
-    [hook]: async () => {
-      if (copyOnce && copied) {
-        return
-      }
-
-      const copyTargets = []
-
-      if (Array.isArray(targets) && targets.length) {
+    buildStart() {
+      if (Array.isArray(targets)) {
         for (const target of targets) {
           if (!isObject(target)) {
-            throw new Error(`${stringify(target)} target must be an object`)
+            throw new Error(`${stringify(target)} target must be an object`);
           }
 
-          const { dest, rename, src, transform, ...restTargetOptions } = target
+          const {
+            src,
+            dest,
+            rename,
+            ...restTargetOptions
+          } = target;
 
           if (!src || !dest) {
-            throw new Error(`${stringify(target)} target must have "src" and "dest" properties`)
+            throw new Error(`${stringify(target)} target must have "src" and "dest" properties`);
           }
 
           if (rename && typeof rename !== 'string' && typeof rename !== 'function') {
-            throw new Error(`${stringify(target)} target's "rename" property must be a string or a function`)
+            throw new Error(`${stringify(target)} target's "rename" property must be a string or a function`);
           }
 
-          const matchedPaths = await globby(src, {
+          const matchedPaths = globby.sync(src, {
             expandDirectories: false,
             onlyFiles: false,
             ...restPluginOptions,
             ...restTargetOptions
-          })
+          });
 
           if (matchedPaths.length) {
-            for (const matchedPath of matchedPaths) {
-              const generatedCopyTargets = Array.isArray(dest)
-                ? await Promise.all(dest.map((destination) => generateCopyTarget(
-                  matchedPath,
-                  destination,
-                  { flatten, rename, transform }
-                )))
-                : [await generateCopyTarget(matchedPath, dest, { flatten, rename, transform })]
-
-              copyTargets.push(...generatedCopyTargets)
-            }
+            matchedPaths.forEach(matchedPath => {
+              const generatedCopyTargets = Array.isArray(dest) ? dest.map(destination => generateCopyTarget(matchedPath, destination, rename)) : [generateCopyTarget(matchedPath, dest, rename)];
+              copyTargets.push(...generatedCopyTargets);
+            });
           }
         }
+      }
+
+      const targetSources = copyTargets.map(({ src }) => path.resolve(src));
+      targetSources.forEach(target => {
+        this.addWatchFile(target);
+      });
+    },
+
+    [hook]: async () => {
+      if (copyOnce && copied) {
+        return;
       }
 
       if (copyTargets.length) {
         if (verbose) {
-          console.log(green('copied:'))
+          console.log(green('copied:'));
         }
 
-        for (const copyTarget of copyTargets) {
-          const { contents, dest, src, transformed } = copyTarget
-
-          if (transformed) {
-            await fs.outputFile(dest, contents, restPluginOptions)
-          } else {
-            await fs.copy(src, dest, restPluginOptions)
-          }
+        for (const {
+          src,
+          dest
+        } of copyTargets) {
+          await fs.copy(src, dest, restPluginOptions);
 
           if (verbose) {
-            let message = green(`  ${bold(src)} → ${bold(dest)}`)
-            const flags = Object.entries(copyTarget)
-              .filter(([key, value]) => ['renamed', 'transformed'].includes(key) && value)
-              .map(([key]) => key.charAt(0).toUpperCase())
-
-            if (flags.length) {
-              message = `${message} ${yellow(`[${flags.join(', ')}]`)}`
-            }
-
-            console.log(message)
+            console.log(green(`  ${bold(src)} → ${bold(dest)}`));
           }
         }
       } else if (verbose) {
-        console.log(yellow('no items to copy'))
+        console.log(yellow('no items to copy'));
       }
 
-      copied = true
+      copied = true;
     }
-  }
 }
