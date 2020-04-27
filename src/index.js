@@ -34,8 +34,12 @@ function renameTarget(targetFilePath, rename) {
  * @param {string}  src
  * @param {string}  dest
  * @param {boolean} options.flatten
- * @param {string|(fileName: string, fileExt: string): string} options.rename
- * @param {(content: string|ArrayBuffer): string|ArrayBuffer} options.transform
+ * @param {string|((fileName: string, fileExt: string) => string)} options.rename
+ * @param {(
+ *          content: string|ArrayBuffer,
+ *          srcPath: string,
+ *          destPath: string
+ *        ): string|ArrayBuffer} options.transform
  */
 async function generateCopyTarget(src, dest, options) {
   const { flatten, rename, transform } = options
@@ -48,13 +52,18 @@ async function generateCopyTarget(src, dest, options) {
     ? dest
     : dir.replace(dir.split('/')[0], dest)
 
-  return {
+  const result = {
     src,
     dest: path.join(destinationFolder, rename ? renameTarget(base, rename) : base),
-    ...(transform && { contents: await transform(await fs.readFile(src)) }),
-    renamed: rename,
-    transformed: transform
+    renamed: Boolean(rename),
+    transformed: false
   }
+
+  if (transform) {
+    result.contents = await transform(await fs.readFile(src), src, dest)
+    result.transformed = true
+  }
+  return result
 }
 
 
