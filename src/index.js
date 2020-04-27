@@ -6,25 +6,39 @@ import isObject from 'is-plain-object'
 import globby from 'globby'
 import { bold, green, yellow } from 'colorette'
 
+
 function stringify(value) {
   return util.inspect(value, { breakLength: Infinity })
 }
 
+
 async function isFile(filePath) {
   const fileStats = await fs.stat(filePath)
-
   return fileStats.isFile()
 }
 
-function renameTarget(target, rename) {
-  const parsedPath = path.parse(target)
 
-  return typeof rename === 'string'
-    ? rename
-    : rename(parsedPath.name, parsedPath.ext.replace('.', ''))
+/**
+ * @param {string} targetFilePath
+ * @param {string|(fileName: string, fileExt: string): string} rename
+ */
+
+function renameTarget(targetFilePath, rename) {
+  const parsedPath = path.parse(targetFilePath)
+  if (typeof rename === 'string') return rename
+  return rename(parsedPath.name, parsedPath.ext.replace(/^(\.)?/, ''))
 }
 
-async function generateCopyTarget(src, dest, { flatten, rename, transform }) {
+
+/**
+ * @param {string}  src
+ * @param {string}  dest
+ * @param {boolean} options.flatten
+ * @param {string|(fileName: string, fileExt: string): string} options.rename
+ * @param {(content: string|ArrayBuffer): string|ArrayBuffer} options.transform
+ */
+async function generateCopyTarget(src, dest, options) {
+  const { flatten, rename, transform } = options
   if (transform && !await isFile(src)) {
     throw new Error(`"transform" option works only on files: '${src}' must be a file`)
   }
@@ -43,17 +57,33 @@ async function generateCopyTarget(src, dest, { flatten, rename, transform }) {
   }
 }
 
+
 export default function copy(options = {}) {
   const {
     copyOnce = false,
     flatten = true,
     hook = 'buildEnd',
     targets = [],
-    verbose = false,
+    verbose: shouldBeVerbose = false,
     ...restPluginOptions
   } = options
 
   let copied = false
+
+  const log = {
+    /**
+     * print verbose messages
+     * @param {string|() => string}   message
+     */
+    verbose(message) {
+      if (!shouldBeVerbose) return
+      if (typeof message === 'function') {
+      // eslint-disable-next-line no-param-reassign
+        message = message()
+      }
+      console.log(message)
+    }
+  }
 
   return {
     name: 'copy',
@@ -104,9 +134,7 @@ export default function copy(options = {}) {
       }
 
       if (copyTargets.length) {
-        if (verbose) {
-          console.log(green('copied:'))
-        }
+        log.verbose(green('copied:'))
 
         for (const copyTarget of copyTargets) {
           const { contents, dest, src, transformed } = copyTarget
@@ -117,7 +145,7 @@ export default function copy(options = {}) {
             await fs.copy(src, dest, restPluginOptions)
           }
 
-          if (verbose) {
+          log.verbose(() => {
             let message = green(`  ${bold(src)} → ${bold(dest)}`)
             const flags = Object.entries(copyTarget)
               .filter(([key, value]) => ['renamed', 'transformed'].includes(key) && value)
@@ -127,11 +155,11 @@ export default function copy(options = {}) {
               message = `${message} ${yellow(`[${flags.join(', ')}]`)}`
             }
 
-            console.log(message)
-          }
+            return message
+          })
         }
-      } else if (verbose) {
-        console.log(yellow('no items to copy'))
+      } else {
+        log.verbose(yellow('no items to copy'))
       }
 
       copied = true
