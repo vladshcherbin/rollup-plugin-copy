@@ -49,6 +49,14 @@ export interface CopyOptions extends globby.GlobbyOptions, fs.CopyOptions {
   readonly hook?: string
 
   /**
+   * Rollup hook the `this.addWatchFile` should call, only be used in hooks
+   * during the build phase, and must be processed earlier than hook
+   * @default 'buildStart'
+   * @see https://rollupjs.org/guide/en/#thisaddwatchfileid-string--void
+   */
+  readonly watchStart?: 'buildStart' | 'load' | 'resolveId' | 'transform' | string
+
+  /**
    * Array of targets to copy.
    * @default []
    */

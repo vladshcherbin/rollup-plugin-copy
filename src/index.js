@@ -72,106 +72,143 @@ export default function copy(options = {}) {
     copyOnce = false,
     flatten = true,
     hook = 'buildEnd',
+    watchHook = 'buildStart',
     targets = [],
     verbose: shouldBeVerbose = false,
     ...restPluginOptions
   } = options
 
-  let copied = false
-
   const log = {
     /**
      * print verbose messages
-     * @param {string|() => string}   message
+     * @param {string|() => string} message
      */
     verbose(message) {
       if (!shouldBeVerbose) return
       if (typeof message === 'function') {
-      // eslint-disable-next-line no-param-reassign
+        // eslint-disable-next-line no-param-reassign
         message = message()
       }
       console.log(message)
     }
   }
 
-  return {
-    name: 'copy',
-    [hook]: async () => {
-      if (copyOnce && copied) {
-        return
-      }
+  let copied = false
+  let copyTargets = []
 
-      const copyTargets = []
+  async function collectAndWatchingTargets() {
+    const self = this
+    if (copyOnce && copied) {
+      return
+    }
 
-      if (Array.isArray(targets) && targets.length) {
-        for (const target of targets) {
-          if (!isObject(target)) {
-            throw new Error(`${stringify(target)} target must be an object`)
-          }
+    // Recollect copyTargets
+    copyTargets = []
+    if (Array.isArray(targets) && targets.length) {
+      for (const target of targets) {
+        if (!isObject(target)) {
+          throw new Error(`${stringify(target)} target must be an object`)
+        }
 
-          const { dest, rename, src, transform, ...restTargetOptions } = target
+        const { dest, rename, src, transform, ...restTargetOptions } = target
 
-          if (!src || !dest) {
-            throw new Error(`${stringify(target)} target must have "src" and "dest" properties`)
-          }
+        if (!src || !dest) {
+          throw new Error(`${stringify(target)} target must have "src" and "dest" properties`)
+        }
 
-          if (rename && typeof rename !== 'string' && typeof rename !== 'function') {
-            throw new Error(`${stringify(target)} target's "rename" property must be a string or a function`)
-          }
+        if (rename && typeof rename !== 'string' && typeof rename !== 'function') {
+          throw new Error(`${stringify(target)} target's "rename" property must be a string or a function`)
+        }
 
-          const matchedPaths = await globby(src, {
-            expandDirectories: false,
-            onlyFiles: false,
-            ...restPluginOptions,
-            ...restTargetOptions
-          })
+        const matchedPaths = await globby(src, {
+          expandDirectories: false,
+          onlyFiles: false,
+          ...restPluginOptions,
+          ...restTargetOptions
+        })
 
-          if (matchedPaths.length) {
-            for (const matchedPath of matchedPaths) {
-              const generatedCopyTargets = Array.isArray(dest)
-                ? await Promise.all(dest.map((destination) => generateCopyTarget(
-                  matchedPath,
-                  destination,
-                  { flatten, rename, transform }
-                )))
-                : [await generateCopyTarget(matchedPath, dest, { flatten, rename, transform })]
-
-              copyTargets.push(...generatedCopyTargets)
-            }
+        if (matchedPaths.length) {
+          for (const matchedPath of matchedPaths) {
+            const destinations = Array.isArray(dest) ? dest : [dest]
+            const generatedCopyTargets = await Promise.all(
+              destinations.map((destination) => generateCopyTarget(
+                matchedPath,
+                destination,
+                { flatten, rename, transform }
+              ))
+            )
+            copyTargets.push(...generatedCopyTargets)
           }
         }
       }
+    }
 
-      if (copyTargets.length) {
-        log.verbose(green('copied:'))
-
-        for (const copyTarget of copyTargets) {
-          const { contents, dest, src, transformed } = copyTarget
-
-          if (transformed) {
-            await fs.outputFile(dest, contents, restPluginOptions)
-          } else {
-            await fs.copy(src, dest, restPluginOptions)
-          }
-
-          log.verbose(() => {
-            let message = green(`  ${bold(src)} → ${bold(dest)}`)
-            const flags = Object.entries(copyTarget)
-              .filter(([key, value]) => ['renamed', 'transformed'].includes(key) && value)
-              .map(([key]) => key.charAt(0).toUpperCase())
-
-            if (flags.length) {
-              message = `${message} ${yellow(`[${flags.join(', ')}]`)}`
-            }
-
-            return message
-          })
-        }
-      } else {
-        log.verbose(yellow('no items to copy'))
-      }
-
-      copied = true
+    /**
+     * Watching source files
+     */
+    for (const target of copyTargets) {
+      const srcPath = path.resolve(target.src)
+      self.addWatchFile(srcPath)
     }
   }
+
+  /**
+   * Do copy operation
+   */
+  async function handleCopy() {
+    if (copyOnce && copied) {
+      return
+    }
+
+    if (copyTargets.length) {
+      log.verbose(green('copied:'))
+
+      for (const copyTarget of copyTargets) {
+        const { contents, dest, src, transformed } = copyTarget
+
+        if (transformed) {
+          await fs.outputFile(dest, contents, restPluginOptions)
+        } else {
+          await fs.copy(src, dest, restPluginOptions)
+        }
+
+        log.verbose(() => {
+          let message = green(`  ${bold(src)} → ${bold(dest)}`)
+          const flags = Object.entries(copyTarget)
+            .filter(([key, value]) => ['renamed', 'transformed'].includes(key) && value)
+            .map(([key]) => key.charAt(0).toUpperCase())
+
+          if (flags.length) {
+            message = `${message} ${yellow(`[${flags.join(', ')}]`)}`
+          }
+
+          return message
+        })
+      }
+    } else {
+      log.verbose(yellow('no items to copy'))
+    }
+
+    copied = true
+  }
+
+  const plugin = {
+    name: 'copy',
+    async [watchHook](...args) {
+      const self = this
+      await collectAndWatchingTargets.call(self, ...args)
+
+      /**
+       * Merge handleCopy and collectAndWatchingTargets
+       */
+      if (hook === watchHook) {
+        await handleCopy.call(self, ...args)
+      }
+    }
+  }
+
+  if (hook !== watchHook) {
+    plugin[hook] = handleCopy
+  }
+  return plugin
 }
