@@ -5,6 +5,9 @@ module.exports = {
     'object-curly-newline': ['error', { multiline: true, consistent: true }],
     semi: ['error', 'never']
   },
+  ignorePatterns: [
+    'index.d.ts'
+  ],
   env: {
     jest: true
   }

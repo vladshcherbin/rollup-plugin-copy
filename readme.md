@@ -142,7 +142,12 @@ copy({
   targets: [{
     src: 'src/index.html',
     dest: 'dist/public',
-    transform: (contents) => contents.toString().replace('__SCRIPT__', 'app.js')
+    transform: (contents, srcPath, destPath) => (
+      contents.toString()
+        .replace('__SCRIPT__', 'app.js')
+        .replace('__SOURCE_FILE_PATH__', srcPath)
+        .replace('__TARGET_FILE_NAME__', path.basename(srcPath))
+    )
   }]
 })
 ```
@@ -172,6 +177,21 @@ copy({
   hook: 'writeBundle'
 })
 ```
+
+#### watchHook
+
+Type: `string` | Default: `buildStart`
+
+[Rollup hook](https://rollupjs.org/guide/en/#hooks) the [this.addWatchFile](https://rollupjs.org/guide/en/#thisaddwatchfileid-string--void) should call. By default, `addWatchFile` called on each rollup.rollup build.
+Only be used in hooks during the build phase, i.e. in `buildStart`, `load`, `resolveId`, and `transform`.
+
+```js
+copy({
+  targets: [{ src: 'assets/*', dest: 'dist/public' }],
+  watchHook: 'resolveId'
+})
+```
+
 
 #### copyOnce
 
