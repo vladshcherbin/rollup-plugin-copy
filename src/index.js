@@ -52,15 +52,16 @@ async function generateCopyTarget(src, dest, options) {
     ? dest
     : dir.replace(dir.split('/')[0], dest)
 
+  const destFilePath = path.join(destinationFolder, rename ? renameTarget(base, rename) : base)
   const result = {
     src,
-    dest: path.join(destinationFolder, rename ? renameTarget(base, rename) : base),
+    dest: destFilePath,
     renamed: Boolean(rename),
     transformed: false
   }
 
   if (transform) {
-    result.contents = await transform(await fs.readFile(src), src, dest)
+    result.contents = await transform(await fs.readFile(src), src, destFilePath)
     result.transformed = true
   }
   return result
