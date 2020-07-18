@@ -114,7 +114,7 @@ export default function copy(options = {}) {
           if (transformed) {
             await fs.outputFile(dest, contents, restPluginOptions)
           } else {
-            await fs.copy(src, dest, restPluginOptions)
+            await fs.copySync(src, dest, restPluginOptions)
           }
 
           if (verbose) {
