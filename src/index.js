@@ -16,12 +16,12 @@ async function isFile(filePath) {
   return fileStats.isFile()
 }
 
-function renameTarget(target, rename) {
+function renameTarget(target, rename, src) {
   const parsedPath = path.parse(target)
 
   return typeof rename === 'string'
     ? rename
-    : rename(parsedPath.name, parsedPath.ext.replace('.', ''))
+    : rename(parsedPath.name, parsedPath.ext.replace('.', ''), src)
 }
 
 async function generateCopyTarget(src, dest, { flatten, rename, transform }) {
@@ -36,7 +36,7 @@ async function generateCopyTarget(src, dest, { flatten, rename, transform }) {
 
   return {
     src,
-    dest: path.join(destinationFolder, rename ? renameTarget(base, rename) : base),
+    dest: path.join(destinationFolder, rename ? renameTarget(base, rename, src) : base),
     ...(transform && { contents: await transform(await fs.readFile(src)) }),
     renamed: rename,
     transformed: transform
