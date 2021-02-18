@@ -21,10 +21,10 @@ interface Target extends globby.GlobbyOptions {
     /**
      * Modify file contents.
      */
-    readonly transform?: (contents: Buffer) => string;
+    readonly transform?: (contents: Buffer) => any;
 }
 
-interface CopyOptions extends globby.GlobbyOptions, fs.CopyOptions {
+interface CopyOptions extends globby.GlobbyOptions, fs.WriteFileOptions, fs.CopyOptions {
     /**
      * Copy items once. Useful in watch mode.
      * @default false
