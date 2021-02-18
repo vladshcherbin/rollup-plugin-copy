@@ -213,6 +213,14 @@ describe('Copy', () => {
               ? `${name}-renamed.${extension}`
               : `${name}-renamed`
           )
+        },
+        {
+          src: 'src/assets/asset-1.js',
+          dest: 'dist',
+          rename: (name, extension, src) => {
+            expect(src).toBe('src/assets/asset-1.js')
+            return `${name}.${extension}`
+          }
         }
       ]
     })

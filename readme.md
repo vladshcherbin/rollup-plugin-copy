@@ -130,7 +130,7 @@ copy({
   targets: [{
     src: 'assets/docs/*',
     dest: 'dist/public/docs',
-    rename: (name, extension) => `${name}-v1.${extension}`
+    rename: (name, extension, src) => `${name}-v1.${extension}`
   }]
 })
 ```
