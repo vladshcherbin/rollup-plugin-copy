@@ -1,3 +1,4 @@
+import path from 'path'
 import { rollup, watch } from 'rollup'
 import fs from 'fs-extra'
 import replace from 'replace-in-file'
@@ -12,8 +13,8 @@ function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
-function readFile(path) {
-  return fs.readFile(path, 'utf-8')
+function readFile(filePath) {
+  return fs.readFile(filePath, 'utf-8')
 }
 
 async function build(pluginOptions) {
@@ -217,10 +218,7 @@ describe('Copy', () => {
         {
           src: 'src/assets/asset-1.js',
           dest: 'dist',
-          rename: (name, extension, src) => {
-            expect(src).toBe('src/assets/asset-1.js')
-            return `${name}.${extension}`
-          }
+          rename: (_, __, fullPath) => path.basename(fullPath).replace(1, 3)
         }
       ]
     })
@@ -241,6 +239,7 @@ describe('Copy', () => {
     expect(await fs.pathExists('dist/scss-multiple/scss-2-renamed.scss')).toBe(true)
     expect(await fs.pathExists('dist/scss-multiple/nested-renamed')).toBe(true)
     expect(await fs.pathExists('dist/scss-multiple/nested-renamed/scss-3.scss')).toBe(true)
+    expect(await fs.pathExists('dist/asset-3.js')).toBe(true)
   })
 
   test('Throw if transform target is not a file', async () => {
