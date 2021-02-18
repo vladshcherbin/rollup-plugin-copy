@@ -16,7 +16,7 @@ interface Target extends globby.GlobbyOptions {
     /**
      * Change destination file or folder name.
      */
-    readonly rename?: string | ((name: string, extension: string) => string);
+    readonly rename?: string | ((name: string, extension: string, fullPath: string) => string);
 
     /**
      * Modify file contents.
