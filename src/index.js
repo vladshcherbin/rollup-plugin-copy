@@ -37,7 +37,7 @@ async function generateCopyTarget(src, dest, { flatten, rename, transform }) {
   return {
     src,
     dest: path.join(destinationFolder, rename ? renameTarget(base, rename, src) : base),
-    ...(transform && { contents: await transform(await fs.readFile(src)) }),
+    ...(transform && { contents: await transform(await fs.readFile(src), base) }),
     renamed: rename,
     transformed: transform
   }

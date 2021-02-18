@@ -142,7 +142,7 @@ copy({
   targets: [{
     src: 'src/index.html',
     dest: 'dist/public',
-    transform: (contents) => contents.toString().replace('__SCRIPT__', 'app.js')
+    transform: (contents, filename) => contents.toString().replace('__SCRIPT__', 'app.js')
   }]
 })
 ```

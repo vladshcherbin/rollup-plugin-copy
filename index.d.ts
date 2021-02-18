@@ -21,7 +21,7 @@ interface Target extends globby.GlobbyOptions {
     /**
      * Modify file contents.
      */
-    readonly transform?: (contents: Buffer) => any;
+    readonly transform?: (contents: Buffer, name: string) => any;
 }
 
 interface CopyOptions extends globby.GlobbyOptions, fs.WriteFileOptions, fs.CopyOptions {

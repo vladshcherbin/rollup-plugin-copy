@@ -262,6 +262,12 @@ describe('Copy', () => {
         src: 'src/assets/scss/**/*.scss',
         dest: 'dist',
         transform: (contents) => contents.toString().replace('background-color', 'color')
+      }, {
+        src: 'src/assets/css/css-1.css',
+        dest: 'dist/css',
+        transform: (contents, filename) => (
+          contents.toString().replace('blue', filename.replace('ss-1.css', 'oral'))
+        )
       }]
     })
 
@@ -275,6 +281,8 @@ describe('Copy', () => {
     expect(await readFile('dist/scss-2.scss')).toEqual(expect.not.stringContaining('background-color'))
     expect(await fs.pathExists('dist/scss-3.scss')).toBe(true)
     expect(await readFile('dist/scss-3.scss')).toEqual(expect.not.stringContaining('background-color'))
+    expect(await fs.pathExists('dist/css/css-1.css')).toBe(true)
+    expect(await readFile('dist/css/css-1.css')).toEqual(expect.stringContaining('coral'))
   })
 })
 
