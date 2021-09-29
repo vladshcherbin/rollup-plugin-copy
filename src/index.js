@@ -112,7 +112,9 @@ export default function copy(options = {}) {
           const { contents, dest, src, transformed } = copyTarget
 
           if (transformed) {
-            if (!restPluginOptions.filter || restPluginOptions.filter(src, dest)) {
+            if (!restPluginOptions.filter
+              || restPluginOptions.filter(src, dest) === true
+              || await restPluginOptions.filter(src, dest) === true) {
               await fs.outputFile(dest, contents, restPluginOptions)
             }
           } else {
