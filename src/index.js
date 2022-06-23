@@ -80,7 +80,15 @@ export default function copy(options = {}) {
             throw new Error(`${stringify(target)} target's "rename" property must be a string or a function`)
           }
 
-          const matchedPaths = await globby(src, {
+          let patterns = ''
+          if (typeof src === 'string') {
+            patterns = src.replace(/\\/g, '/')
+          }
+          if (Array.isArray(src)) {
+            patterns = src.map((i) => i.replace(/\\/g, '/'))
+          }
+
+          const matchedPaths = await globby(patterns, {
             expandDirectories: false,
             onlyFiles: false,
             ...restPluginOptions,
