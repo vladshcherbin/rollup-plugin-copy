@@ -39,6 +39,10 @@ export default {
 }
 ```
 
+**Note**: if you're using any kind of clean/delete plugins, such as [rollup-plugin-del](https://www.npmjs.com/package/rollup-plugin-del), 
+which remove any of the destination folders, ensure that this plugin is run **after** that plugin, otherwise the copied files might
+accidentally be deleted.
+
 ### Configuration
 
 There are some useful options:

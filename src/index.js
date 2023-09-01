@@ -112,8 +112,16 @@ export default function copy(options = {}) {
           const { contents, dest, src, transformed } = copyTarget
 
           if (transformed) {
+            if (!fs.existsSync(path.dirname(dest))) {
+              fs.mkdirSync(path.dirname(dest), { recursive: true })
+            }
+
             await fs.outputFile(dest, contents, restPluginOptions)
           } else {
+            if (!fs.existsSync(path.dirname(dest))) {
+              fs.mkdirSync(path.dirname(dest), { recursive: true })
+            }
+
             await fs.copy(src, dest, restPluginOptions)
           }
 
