@@ -184,6 +184,19 @@ copy({
   targets: [{ src: 'assets/*', dest: 'dist/public' }],
   copyOnce: true
 })
+
+```
+#### copySync
+
+Type: `boolean` | Default: `false`
+
+Copy items synchronous.
+
+```js
+copy({
+  targets: [{ src: 'assets/*', dest: 'dist/public' }],
+  copySync: true
+})
 ```
 
 #### flatten

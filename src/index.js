@@ -46,6 +46,7 @@ async function generateCopyTarget(src, dest, { flatten, rename, transform }) {
 export default function copy(options = {}) {
   const {
     copyOnce = false,
+    copySync = false,
     flatten = true,
     hook = 'buildEnd',
     targets = [],
@@ -113,8 +114,10 @@ export default function copy(options = {}) {
 
           if (transformed) {
             await fs.outputFile(dest, contents, restPluginOptions)
+          } else if (!copySync) {
+            await fs.copy(src, dest, restPluginOptions)
           } else {
-            await fs.copySync(src, dest, restPluginOptions)
+            fs.copySync(src, dest, restPluginOptions)
           }
 
           if (verbose) {

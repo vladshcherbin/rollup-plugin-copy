@@ -32,6 +32,12 @@ interface CopyOptions extends globby.GlobbyOptions, fs.WriteFileOptions, fs.Copy
     readonly copyOnce?: boolean;
 
     /**
+     * Copy items synchronous.
+     * @default false
+     */
+    readonly copySync?: boolean;
+
+    /**
      * Remove the directory structure of copied files.
      * @default true
      */

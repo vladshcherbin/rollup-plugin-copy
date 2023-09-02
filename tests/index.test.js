@@ -431,6 +431,22 @@ describe('Options', () => {
     })
   })
 
+  test('Copy sync', async () => {
+    await build({
+      targets: [{
+        src: [
+          'src/assets/asset-1.js',
+          'src/assets/asset-2.js'
+        ],
+        dest: 'dist'
+      }],
+      copySync: true
+    })
+
+    expect(await fs.pathExists('dist/asset-1.js')).toBe(true)
+    expect(await fs.pathExists('dist/asset-2.js')).toBe(true)
+  })
+
   test('Flatten', async () => {
     await build({
       targets: [{
