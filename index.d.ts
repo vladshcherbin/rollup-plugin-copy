@@ -23,29 +23,29 @@ interface Target extends globby.GlobbyOptions {
      */
     readonly transform?: (contents: Buffer, name: string) => any;
 
-	/**
-	If set to `true`, `globby` will automatically glob directories for you. If you define an `Array` it will only glob files that matches the patterns inside the `Array`. You can also define an `Object` with `files` and `extensions` like in the example below.
+    /**
+    If set to `true`, `globby` will automatically glob directories for you. If you define an `Array` it will only glob files that matches the patterns inside the `Array`. You can also define an `Object` with `files` and `extensions` like in the example below.
 
-	Note that if you set this option to `false`, you won't get back matched directories unless you set `onlyFiles: false`.
+    Note that if you set this option to `false`, you won't get back matched directories unless you set `onlyFiles: false`.
 
-	@default false
+    @default false
 
-	@example
-	```
-	import {globby} from 'globby';
+    @example
+    ```
+    import {globby} from 'globby';
 
-	const paths = await globby('images', {
-		expandDirectories: {
-			files: ['cat', 'unicorn', '*.jpg'],
-			extensions: ['png']
-		}
-	});
+    const paths = await globby('images', {
+        expandDirectories: {
+            files: ['cat', 'unicorn', '*.jpg'],
+            extensions: ['png']
+        }
+    });
 
-	console.log(paths);
-	//=> ['cat.png', 'unicorn.png', 'cow.jpg', 'rainbow.jpg']
-	```
-	*/
-	readonly expandDirectories?: globby.ExpandDirectoriesOption;
+    console.log(paths);
+    //=> ['cat.png', 'unicorn.png', 'cow.jpg', 'rainbow.jpg']
+    ```
+    */
+    readonly expandDirectories?: globby.ExpandDirectoriesOption;
 
     /**
      * Return only files
@@ -53,7 +53,6 @@ interface Target extends globby.GlobbyOptions {
      * @default false
      */
     readonly onlyFiles?: boolean;
-
 }
 
 interface CopyOptions extends globby.GlobbyOptions, fs.WriteFileOptions, fs.CopyOptions {
