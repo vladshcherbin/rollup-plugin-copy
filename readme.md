@@ -212,6 +212,19 @@ copy({
 })
 ```
 
+#### watchTargets
+
+Type: `boolean` | Default: `false`
+
+Add the files specified in `targets` to the watch list
+
+```js
+copy({
+  targets: [{ src: "assets/**/*", dest: "dist/public" }],
+  watchTargets: true,
+})
+```
+
 All other options are passed to packages, used inside:
   - [globby](https://github.com/sindresorhus/globby)
   - [fs-extra copy function](https://github.com/jprichardson/node-fs-extra/blob/7.0.0/docs/copy.md)
