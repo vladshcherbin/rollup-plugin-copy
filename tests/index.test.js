@@ -497,4 +497,56 @@ describe('Options', () => {
 
     expect(await fs.pathExists('dist/asset-1.js')).toBe(false)
   })
+
+  /* eslint-disable no-console */
+  test('Watch target files', async () => {
+    console.log = jest.fn()
+
+    const watcher = watch({
+      input: 'src/index.js',
+      output: {
+        dir: 'build',
+        format: 'esm'
+      },
+      plugins: [
+        copy({
+          targets: [{
+            src: 'src/assets/css/css-*.css',
+            dest: 'dist'
+          }],
+          verbose: true,
+          watchTargets: true
+        })
+      ]
+    })
+
+    await sleep(1000)
+
+    expect(await fs.pathExists('dist/css-1.css')).toBe(true)
+    expect(await readFile('src/assets/css/css-1.css')).toEqual(expect.stringContaining('blue'))
+    expect(await readFile('dist/css-1.css')).toEqual(expect.stringContaining('blue'))
+    expect(await fs.pathExists('dist/css-2.css')).toBe(true)
+
+    await replace({
+      files: 'src/assets/css/css-1.css',
+      from: 'blue',
+      to: 'red'
+    })
+
+    await sleep(1000)
+
+    expect(await readFile('dist/css-1.css')).toEqual(expect.stringContaining('red'))
+
+    watcher.close()
+
+    await replace({
+      files: 'src/assets/css/css-1.css',
+      from: 'red',
+      to: 'blue'
+    })
+
+    expect(console.log).toHaveBeenCalledWith(green('extra watch targets:'))
+    expect(console.log).toHaveBeenCalledWith(`${green(`  ${bold('src/assets/css/css-1.css')}`)}`)
+    expect(console.log).toHaveBeenCalledWith(`${green(`  ${bold('src/assets/css/css-2.css')}`)}`)
+  })
 })

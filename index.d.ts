@@ -60,6 +60,12 @@ interface CopyOptions extends globby.GlobbyOptions, fs.WriteFileOptions, fs.Copy
      * @default false
      */
     readonly verbose?: boolean;
+
+    /**
+     * Watch targets for changes.
+     * @default false
+     */
+    readonly watchTargets?: boolean;
 }
 
 /**
