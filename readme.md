@@ -8,6 +8,9 @@ Copy files and folders, with glob support.
 ## Installation
 
 ```bash
+# pnpm
+pnpm add rollup-plugin-copy -D
+
 # yarn
 yarn add rollup-plugin-copy -D
 

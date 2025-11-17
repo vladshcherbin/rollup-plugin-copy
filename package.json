@@ -11,8 +11,8 @@
     "clean": "rimraf coverage dist",
     "build": "rollup -c",
     "lint": "eslint src tests",
-    "postpublish": "yarn clean",
-    "prepublishOnly": "yarn lint && yarn test && yarn clean && yarn build",
+    "postpublish": "pnpm clean",
+    "prepublishOnly": "pnpm lint && pnpm test && pnpm clean && pnpm build",
     "test": "jest"
   },
   "dependencies": {
