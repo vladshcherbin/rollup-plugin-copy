@@ -16,11 +16,11 @@
     "test": "node --test --experimental-test-coverage"
   },
   "dependencies": {
-    "@types/fs-extra": "^8.0.1",
-    "colorette": "^1.1.0",
-    "fs-extra": "^8.1.0",
-    "globby": "10.0.1",
-    "is-plain-object": "^3.0.0"
+    "@types/fs-extra": "^11.0.4",
+    "colorette": "^2.0.20",
+    "fs-extra": "^11.3.2",
+    "globby": "16.0.0",
+    "is-plain-object": "^5.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.12.17",

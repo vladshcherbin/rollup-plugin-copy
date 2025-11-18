@@ -2,7 +2,7 @@ import path from 'node:path'
 import assert from 'node:assert/strict'
 import { afterEach, before, describe, test } from 'node:test'
 import { setTimeout } from 'node:timers/promises'
-import { bold, green, yellow, options } from 'colorette'
+import { bold, green, yellow } from 'colorette'
 import fs from 'fs-extra'
 import replace from 'replace-in-file'
 import { rollup, watch } from 'rollup'
@@ -10,7 +10,6 @@ import copy from '../src/index.js'
 
 before(() => {
   process.chdir(new URL('./fixtures', import.meta.url).pathname);
-  options.enabled = true
 })
 
 function readFile(filePath) {
@@ -315,9 +314,9 @@ describe('Options', () => {
     assert.strictEqual(console.log.mock.callCount(), 5)
     assert.strictEqual(console.log.mock.calls[0].arguments[0], green('copied:'))
     assert.strictEqual(console.log.mock.calls[1].arguments[0], green(`  ${bold('src/assets/asset-1.js')} → ${bold('dist/asset-1.js')}`))
-    assert.strictEqual(console.log.mock.calls[2].arguments[0], green(`  ${bold('src/assets/css/css-1.css')} → ${bold('dist/css-1.css')}`))
-    assert.strictEqual(console.log.mock.calls[3].arguments[0], green(`  ${bold('src/assets/css/css-2.css')} → ${bold('dist/css-2.css')}`))
-    assert.strictEqual(console.log.mock.calls[4].arguments[0], green(`  ${bold('src/assets/scss')} → ${bold('dist/scss')}`))
+    assert.strictEqual(console.log.mock.calls[2].arguments[0], green(`  ${bold('src/assets/scss')} → ${bold('dist/scss')}`))
+    assert.strictEqual(console.log.mock.calls[3].arguments[0], green(`  ${bold('src/assets/css/css-1.css')} → ${bold('dist/css-1.css')}`))
+    assert.strictEqual(console.log.mock.calls[4].arguments[0], green(`  ${bold('src/assets/css/css-2.css')} → ${bold('dist/css-2.css')}`))
   })
 
   test('Verbose, no files to copy', async ({ mock }) => {
