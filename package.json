@@ -8,12 +8,12 @@
   "module": "dist/index.module.js",
   "types": "index.d.ts",
   "scripts": {
-    "clean": "rimraf coverage dist",
+    "clean": "rimraf dist",
     "build": "rollup -c",
     "lint": "eslint src tests",
     "postpublish": "pnpm clean",
     "prepublishOnly": "pnpm lint && pnpm test && pnpm clean && pnpm build",
-    "test": "jest"
+    "test": "node --test --experimental-test-coverage"
   },
   "dependencies": {
     "@types/fs-extra": "^8.0.1",
@@ -25,12 +25,9 @@
   "devDependencies": {
     "@babel/core": "^7.12.17",
     "@babel/preset-env": "^7.12.17",
-    "babel-jest": "^25.5.1",
-    "codecov": "^3.6.1",
     "eslint": "6.5.1",
     "eslint-config-airbnb-base": "^14.0.0",
     "eslint-plugin-import": "^2.20.0",
-    "jest": "^25.5.4",
     "replace-in-file": "^5.0.2",
     "rimraf": "^6.1.0",
     "rollup": "^1.29.0",
@@ -58,5 +55,6 @@
   "engines": {
     "node": ">=8.3"
   },
+  "type": "module",
   "license": "MIT"
 }

@@ -1,7 +1,6 @@
 # rollup-plugin-copy
 
 [![Build Status](https://travis-ci.com/vladshcherbin/rollup-plugin-copy.svg?branch=master)](https://travis-ci.com/vladshcherbin/rollup-plugin-copy)
-[![Codecov](https://codecov.io/gh/vladshcherbin/rollup-plugin-copy/branch/master/graph/badge.svg)](https://codecov.io/gh/vladshcherbin/rollup-plugin-copy)
 
 Copy files and folders, with glob support.
 
