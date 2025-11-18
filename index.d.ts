@@ -65,4 +65,6 @@ interface CopyOptions extends globby.GlobbyOptions, fs.WriteFileOptions, fs.Copy
 /**
  * Copy files and folders using Rollup
  */
-export default function copy(options?: CopyOptions): rollup.Plugin;
+declare function copy(options?: CopyOptions): rollup.Plugin;
+
+export = copy;
