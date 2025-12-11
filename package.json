@@ -9,7 +9,7 @@
   "types": "index.d.ts",
   "scripts": {
     "clean": "rimraf dist",
-    "build": "rollup -c",
+    "build": "tsdown",
     "lint": "eslint src tests",
     "postpublish": "pnpm clean",
     "prepublishOnly": "pnpm lint && pnpm test && pnpm clean && pnpm build",
@@ -29,7 +29,7 @@
     "replace-in-file": "^5.0.2",
     "rimraf": "^6.1.0",
     "rollup": "^1.29.0",
-    "rollup-plugin-auto-external": "^2.0.0"
+    "tsdown": "^0.18.2"
   },
   "files": [
     "dist",
