@@ -23,16 +23,13 @@
     "is-plain-object": "^5.0.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.12.17",
-    "@babel/preset-env": "^7.12.17",
     "eslint": "6.5.1",
     "eslint-config-airbnb-base": "^14.0.0",
     "eslint-plugin-import": "^2.20.0",
     "replace-in-file": "^5.0.2",
     "rimraf": "^6.1.0",
     "rollup": "^1.29.0",
-    "rollup-plugin-auto-external": "^2.0.0",
-    "rollup-plugin-babel": "^4.3.3"
+    "rollup-plugin-auto-external": "^2.0.0"
   },
   "files": [
     "dist",
