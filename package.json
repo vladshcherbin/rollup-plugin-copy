@@ -8,11 +8,9 @@
   "module": "dist/index.module.js",
   "types": "index.d.ts",
   "scripts": {
-    "clean": "rimraf dist",
     "build": "tsdown",
     "lint": "eslint",
-    "postpublish": "pnpm clean",
-    "prepublishOnly": "pnpm lint && pnpm test && pnpm clean && pnpm build",
+    "prepublishOnly": "pnpm lint && pnpm test && pnpm build",
     "test": "node --test --experimental-test-coverage"
   },
   "dependencies": {
@@ -26,7 +24,6 @@
     "@shcherbin/eslint-config-node": "^0.4.1",
     "eslint": "^9.39.2",
     "replace-in-file": "^5.0.2",
-    "rimraf": "^6.1.0",
     "rollup": "^1.29.0",
     "tsdown": "^0.18.2"
   },
