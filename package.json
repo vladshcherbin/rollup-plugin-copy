@@ -14,9 +14,7 @@
     "test": "node --test --experimental-test-coverage"
   },
   "dependencies": {
-    "@types/fs-extra": "^11.0.4",
     "colorette": "^2.0.20",
-    "fs-extra": "^11.3.2",
     "globby": "16.0.0",
     "is-plain-object": "^5.0.0"
   },
@@ -25,7 +23,9 @@
   },
   "devDependencies": {
     "@shcherbin/eslint-config-node": "^0.4.1",
+    "@types/fs-extra": "^11.0.4",
     "eslint": "^9.39.2",
+    "fs-extra": "^11.3.3",
     "replace-in-file": "^5.0.2",
     "rollup": "^4.54.0",
     "tsdown": "^0.18.2",
