@@ -1,7 +1,5 @@
 # rollup-plugin-copy
 
-[![Build Status](https://travis-ci.com/vladshcherbin/rollup-plugin-copy.svg?branch=master)](https://travis-ci.com/vladshcherbin/rollup-plugin-copy)
-
 Copy files and folders, with glob support.
 
 ## Installation
