@@ -19,9 +19,8 @@
     "test": "node --test"
   },
   "dependencies": {
-    "colorette": "^2.0.20",
-    "globby": "16.1.0",
-    "is-plain-object": "^5.0.0"
+    "@sindresorhus/is": "^7.1.1",
+    "globby": "16.1.0"
   },
   "peerDependencies": {
     "rollup": "*"
