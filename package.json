@@ -20,11 +20,14 @@
     "globby": "16.0.0",
     "is-plain-object": "^5.0.0"
   },
+  "peerDependencies": {
+    "rollup": "*"
+  },
   "devDependencies": {
     "@shcherbin/eslint-config-node": "^0.4.1",
     "eslint": "^9.39.2",
     "replace-in-file": "^5.0.2",
-    "rollup": "^1.29.0",
+    "rollup": "^4.54.0",
     "tsdown": "^0.18.2",
     "typescript": "^5.9.3"
   },
