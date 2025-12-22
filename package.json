@@ -9,9 +9,10 @@
   "types": "index.d.ts",
   "scripts": {
     "build": "tsdown",
+    "coverage": "node --test --experimental-test-coverage",
     "lint": "eslint",
     "prepublishOnly": "pnpm lint && pnpm test && pnpm build",
-    "test": "node --test --experimental-test-coverage"
+    "test": "node --test"
   },
   "dependencies": {
     "colorette": "^2.0.20",
