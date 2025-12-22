@@ -15,7 +15,7 @@
   },
   "dependencies": {
     "colorette": "^2.0.20",
-    "globby": "16.0.0",
+    "globby": "16.1.0",
     "is-plain-object": "^5.0.0"
   },
   "peerDependencies": {
@@ -26,7 +26,7 @@
     "@types/fs-extra": "^11.0.4",
     "eslint": "^9.39.2",
     "fs-extra": "^11.3.3",
-    "replace-in-file": "^5.0.2",
+    "replace-in-file": "^8.4.0",
     "rollup": "^4.54.0",
     "tsdown": "^0.18.2",
     "typescript": "^5.9.3"
