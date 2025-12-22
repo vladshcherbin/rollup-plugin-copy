@@ -4,9 +4,13 @@
   "version": "3.5.0",
   "author": "Vlad Shcherbin <vlad.shcherbin@gmail.com>",
   "repository": "vladshcherbin/rollup-plugin-copy",
-  "main": "dist/index.commonjs.js",
-  "module": "dist/index.module.js",
-  "types": "index.d.ts",
+  "exports": {
+    ".": "./dist/index.mjs",
+    "./package.json": "./package.json"
+  },
+  "main": "./dist/index.mjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.mts",
   "scripts": {
     "build": "tsdown",
     "coverage": "node --test --experimental-test-coverage",
@@ -34,7 +38,6 @@
   },
   "files": [
     "dist",
-    "index.d.ts",
     "readme.md"
   ],
   "keywords": [
