@@ -23,11 +23,13 @@
     "globby": "16.1.0"
   },
   "peerDependencies": {
+    "@types/node": "*",
     "rollup": "*"
   },
   "devDependencies": {
     "@shcherbin/eslint-config-node": "^0.4.1",
     "@types/fs-extra": "^11.0.4",
+    "@types/node": "^25.0.3",
     "eslint": "^9.39.2",
     "fs-extra": "^11.3.3",
     "replace-in-file": "^8.4.0",
