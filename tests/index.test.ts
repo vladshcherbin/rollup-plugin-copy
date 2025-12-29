@@ -13,7 +13,7 @@ import type Options from '../src/types.ts'
 
 async function build(options?: Options) {
   await rollup({
-    input: 'src/index.js',
+    input: 'src/index.ts',
     plugins: [
       copy(options)
     ]
@@ -24,10 +24,6 @@ before(() => {
   process.chdir(`${import.meta.dirname}/fixtures`)
 })
 
-// function readFile(filePath) {
-//   return fs.readFile(filePath, 'utf-8')
-// }
-
 afterEach(async () => {
   await remove('build')
   await remove('dist')
@@ -37,7 +33,7 @@ await describe('Copy', async () => {
   await test('No config passed', async () => {
     await build()
 
-    assert.strictEqual(await pathExists('dist/asset-1.js'), false)
+    assert.strictEqual(await pathExists('dist/asset-1.ts'), false)
   })
 
   await test('Empty array as target', async () => {
@@ -45,7 +41,7 @@ await describe('Copy', async () => {
       targets: []
     })
 
-    assert.strictEqual(await pathExists('dist/asset-1.js'), false)
+    assert.strictEqual(await pathExists('dist/asset-1.ts'), false)
   })
 
   await test('Files', async () => {
@@ -53,14 +49,14 @@ await describe('Copy', async () => {
       targets: [{
         dest: 'dist',
         src: [
-          'src/assets/asset-1.js',
-          'src/assets/asset-2.js'
+          'src/assets/asset-1.ts',
+          'src/assets/asset-2.ts'
         ]
       }]
     })
 
-    assert.strictEqual(await pathExists('dist/asset-1.js'), true)
-    assert.strictEqual(await pathExists('dist/asset-2.js'), true)
+    assert.strictEqual(await pathExists('dist/asset-1.ts'), true)
+    assert.strictEqual(await pathExists('dist/asset-2.ts'), true)
   })
 
   await test('Folders', async () => {
@@ -89,7 +85,7 @@ await describe('Copy', async () => {
       targets: [{
         dest: 'dist',
         src: [
-          'src/assets/asset-{1,2}.js',
+          'src/assets/asset-{1,2}.ts',
           'src/assets/css/*.css',
           '!**/css-1.css',
           'src/assets/scss/scss-?(1).scss'
@@ -97,8 +93,8 @@ await describe('Copy', async () => {
       }]
     })
 
-    assert.strictEqual(await pathExists('dist/asset-1.js'), true)
-    assert.strictEqual(await pathExists('dist/asset-2.js'), true)
+    assert.strictEqual(await pathExists('dist/asset-1.ts'), true)
+    assert.strictEqual(await pathExists('dist/asset-2.ts'), true)
     assert.strictEqual(await pathExists('dist/css-1.css'), false)
     assert.strictEqual(await pathExists('dist/css-2.css'), true)
     assert.strictEqual(await pathExists('dist/scss-1.scss'), true)
@@ -113,8 +109,8 @@ await describe('Copy', async () => {
       ]
     })
 
-    assert.strictEqual(await pathExists('dist/asset-1.js'), true)
-    assert.strictEqual(await pathExists('dist/asset-2.js'), true)
+    assert.strictEqual(await pathExists('dist/asset-1.ts'), true)
+    assert.strictEqual(await pathExists('dist/asset-2.ts'), true)
     assert.strictEqual(await pathExists('dist/css'), true)
     assert.strictEqual(await pathExists('dist/css/css-1.css'), true)
     assert.strictEqual(await pathExists('dist/css/css-2.css'), true)
@@ -127,19 +123,19 @@ await describe('Copy', async () => {
       targets: [{
         dest: ['dist', 'build'],
         src: [
-          'src/assets/asset-1.js',
+          'src/assets/asset-1.ts',
           'src/assets/css',
           'src/assets/scss/scss-?(1).scss'
         ]
       }]
     })
 
-    assert.strictEqual(await pathExists('dist/asset-1.js'), true)
+    assert.strictEqual(await pathExists('dist/asset-1.ts'), true)
     assert.strictEqual(await pathExists('dist/css'), true)
     assert.strictEqual(await pathExists('dist/css/css-1.css'), true)
     assert.strictEqual(await pathExists('dist/css/css-2.css'), true)
     assert.strictEqual(await pathExists('dist/scss-1.scss'), true)
-    assert.strictEqual(await pathExists('build/asset-1.js'), true)
+    assert.strictEqual(await pathExists('build/asset-1.ts'), true)
     assert.strictEqual(await pathExists('build/css'), true)
     assert.strictEqual(await pathExists('build/css/css-1.css'), true)
     assert.strictEqual(await pathExists('build/css/css-2.css'), true)
@@ -151,14 +147,14 @@ await describe('Copy', async () => {
       targets: [
         { dest: 'dist', src: 'src/assets/css' },
         { dest: 'dist', src: 'src/assets/css' },
-        { dest: 'build', src: ['src/assets/asset-1.js', 'src/assets/asset-1.js'] }
+        { dest: 'build', src: ['src/assets/asset-1.ts', 'src/assets/asset-1.ts'] }
       ]
     })
 
     assert.strictEqual(await pathExists('dist/css'), true)
     assert.strictEqual(await pathExists('dist/css/css-1.css'), true)
     assert.strictEqual(await pathExists('dist/css/css-2.css'), true)
-    assert.strictEqual(await pathExists('build/asset-1.js'), true)
+    assert.strictEqual(await pathExists('build/asset-1.ts'), true)
   })
 
   await test('Throw if target is not an object', async () => {
@@ -166,10 +162,10 @@ await describe('Copy', async () => {
       build({
         targets: [
           // @ts-expect-error
-          'src/assets/asset-1.js'
+          'src/assets/asset-1.ts'
         ]
       }),
-      { message: '\'src/assets/asset-1.js\' target must be an object' }
+      { message: '\'src/assets/asset-1.ts\' target must be an object' }
     )
   })
 
@@ -178,10 +174,10 @@ await describe('Copy', async () => {
       build({
         targets: [
           // @ts-expect-error
-          { src: 'src/assets/asset-1.js' }
+          { src: 'src/assets/asset-1.ts' }
         ]
       }),
-      { message: '{ src: \'src/assets/asset-1.js\' } target must have "src" and "dest" properties' }
+      { message: '{ src: \'src/assets/asset-1.ts\' } target must have "src" and "dest" properties' }
     )
   })
 
@@ -191,21 +187,21 @@ await describe('Copy', async () => {
         targets: [
           // @ts-expect-error
 
-          { src: 'src/assets/asset-1.js', dest: 'dist', rename: [] }
+          { src: 'src/assets/asset-1.ts', dest: 'dist', rename: [] }
         ]
       }),
-      { message: '{ src: \'src/assets/asset-1.js\', dest: \'dist\', rename: [] } target\'s "rename" property must be a string or a function' }
+      { message: '{ src: \'src/assets/asset-1.ts\', dest: \'dist\', rename: [] } target\'s "rename" property must be a string or a function' }
     )
   })
 
   await test('Rename target', async () => {
     await build({
       targets: [
-        { src: 'src/assets/asset-1.js', dest: 'dist', rename: 'asset-1-renamed.js' },
+        { src: 'src/assets/asset-1.ts', dest: 'dist', rename: 'asset-1-renamed.ts' },
         { src: 'src/assets/css', dest: 'dist', rename: 'css-renamed' },
         { src: 'src/assets/css/*', dest: 'dist/css-multiple', rename: 'css-1.css' },
         {
-          src: 'src/assets/asset-2.js',
+          src: 'src/assets/asset-2.ts',
           dest: 'dist',
           rename: (name, extension) => `${name}-renamed.${extension}`
         },
@@ -224,20 +220,20 @@ await describe('Copy', async () => {
           )
         },
         {
-          src: 'src/assets/asset-1.js',
+          src: 'src/assets/asset-1.ts',
           dest: 'dist',
-          rename: (_, __, fullPath) => basename(fullPath).replace(1, 3)
+          rename: (name, extension, fullPath) => basename(fullPath).replace('1', '3')
         }
       ]
     })
 
-    assert.strictEqual(await pathExists('dist/asset-1-renamed.js'), true)
+    assert.strictEqual(await pathExists('dist/asset-1-renamed.ts'), true)
     assert.strictEqual(await pathExists('dist/css-renamed'), true)
     assert.strictEqual(await pathExists('dist/css-renamed/css-1.css'), true)
     assert.strictEqual(await pathExists('dist/css-renamed/css-2.css'), true)
     assert.strictEqual(await pathExists('dist/css-multiple/css-1.css'), true)
     assert.strictEqual(await pathExists('dist/css-multiple/css-2.css'), false)
-    assert.strictEqual(await pathExists('dist/asset-2-renamed.js'), true)
+    assert.strictEqual(await pathExists('dist/asset-2-renamed.ts'), true)
     assert.strictEqual(await pathExists('dist/scss-renamed'), true)
     assert.strictEqual(await pathExists('dist/scss-renamed/scss-1.scss'), true)
     assert.strictEqual(await pathExists('dist/scss-renamed/scss-2.scss'), true)
@@ -247,7 +243,7 @@ await describe('Copy', async () => {
     assert.strictEqual(await pathExists('dist/scss-multiple/scss-2-renamed.scss'), true)
     assert.strictEqual(await pathExists('dist/scss-multiple/nested-renamed'), true)
     assert.strictEqual(await pathExists('dist/scss-multiple/nested-renamed/scss-3.scss'), true)
-    assert.strictEqual(await pathExists('dist/asset-3.js'), true)
+    assert.strictEqual(await pathExists('dist/asset-3.ts'), true)
   })
 
   await test('Throw if transform target is not a file', async () => {
@@ -317,7 +313,7 @@ await describe('Options', async () => {
       targets: [{
         dest: 'dist',
         src: [
-          'src/assets/asset-1.js',
+          'src/assets/asset-1.ts',
           'src/assets/css/*',
           'src/assets/scss',
           'src/not-exist'
@@ -328,7 +324,7 @@ await describe('Options', async () => {
 
     assert.strictEqual(log.mock.callCount(), 5)
     assert.strictEqual(log.mock.calls[0]!.arguments[0], styleText('green', 'copied:'))
-    assert.strictEqual(log.mock.calls[1]!.arguments[0], styleText('green', `  ${styleText('bold', 'src/assets/asset-1.js')} → ${styleText('bold', 'dist/asset-1.js')}`))
+    assert.strictEqual(log.mock.calls[1]!.arguments[0], styleText('green', `  ${styleText('bold', 'src/assets/asset-1.ts')} → ${styleText('bold', 'dist/asset-1.ts')}`))
     assert.strictEqual(log.mock.calls[2]!.arguments[0], styleText('green', `  ${styleText('bold', 'src/assets/scss')} → ${styleText('bold', 'dist/scss')}`))
     assert.strictEqual(log.mock.calls[3]!.arguments[0], styleText('green', `  ${styleText('bold', 'src/assets/css/css-1.css')} → ${styleText('bold', 'dist/css-1.css')}`))
     assert.strictEqual(log.mock.calls[4]!.arguments[0], styleText('green', `  ${styleText('bold', 'src/assets/css/css-2.css')} → ${styleText('bold', 'dist/css-2.css')}`))
@@ -350,7 +346,7 @@ await describe('Options', async () => {
     await build({
       targets: [
 
-        { src: 'src/assets/asset-1.js', dest: 'dist', rename: 'asset-1-renamed.js' },
+        { src: 'src/assets/asset-1.ts', dest: 'dist', rename: 'asset-1-renamed.ts' },
         {
           dest: 'dist/scss-multiple',
           rename: (name, extension) => (
@@ -366,7 +362,7 @@ await describe('Options', async () => {
 
     assert.strictEqual(log.mock.callCount(), 5)
     assert.strictEqual(log.mock.calls[0]!.arguments[0], styleText('green', 'copied:'))
-    assert.strictEqual(log.mock.calls[1]!.arguments[0], `${styleText('green', `  ${styleText('bold', 'src/assets/asset-1.js')} → ${styleText('bold', 'dist/asset-1-renamed.js')}`)} ${styleText('yellow', '[R]')}`)
+    assert.strictEqual(log.mock.calls[1]!.arguments[0], `${styleText('green', `  ${styleText('bold', 'src/assets/asset-1.ts')} → ${styleText('bold', 'dist/asset-1-renamed.ts')}`)} ${styleText('yellow', '[R]')}`)
     assert.strictEqual(log.mock.calls[2]!.arguments[0], `${styleText('green', `  ${styleText('bold', 'src/assets/scss/nested')} → ${styleText('bold', 'dist/scss-multiple/nested-renamed')}`)} ${styleText('yellow', '[R]')}`)
     assert.strictEqual(log.mock.calls[3]!.arguments[0], `${styleText('green', `  ${styleText('bold', 'src/assets/scss/scss-1.scss')} → ${styleText('bold', 'dist/scss-multiple/scss-1-renamed.scss')}`)} ${styleText('yellow', '[R]')}`)
     assert.strictEqual(log.mock.calls[4]!.arguments[0], `${styleText('green', `  ${styleText('bold', 'src/assets/scss/scss-2.scss')} → ${styleText('bold', 'dist/scss-multiple/scss-2-renamed.scss')}`)} ${styleText('yellow', '[R]')}`)
@@ -393,11 +389,11 @@ await describe('Options', async () => {
       hook: 'buildStart',
       targets: [{
         dest: 'dist',
-        src: ['src/assets/asset-1.js', 'src/assets/css']
+        src: ['src/assets/asset-1.ts', 'src/assets/css']
       }]
     })
 
-    assert.strictEqual(await pathExists('dist/asset-1.js'), true)
+    assert.strictEqual(await pathExists('dist/asset-1.ts'), true)
     assert.strictEqual(await pathExists('dist/css'), true)
     assert.strictEqual(await pathExists('dist/css/css-1.css'), true)
     assert.strictEqual(await pathExists('dist/css/css-2.css'), true)
@@ -405,7 +401,7 @@ await describe('Options', async () => {
 
   await test('Copy once', async () => {
     const watcher = watch({
-      input: 'src/index.js',
+      input: 'src/index.ts',
       output: {
         dir: 'build',
         format: 'esm'
@@ -413,7 +409,7 @@ await describe('Options', async () => {
       plugins: [
         copy({
           targets: [
-            { src: 'src/assets/asset-1.js', dest: 'dist' }
+            { src: 'src/assets/asset-1.ts', dest: 'dist' }
           ],
           copyOnce: true
         })
@@ -422,26 +418,26 @@ await describe('Options', async () => {
 
     await setTimeout(500)
 
-    assert.strictEqual(await pathExists('dist/asset-1.js'), true)
+    assert.strictEqual(await pathExists('dist/asset-1.ts'), true)
 
     await remove('dist')
 
-    assert.strictEqual(await pathExists('dist/asset-1.js'), false)
+    assert.strictEqual(await pathExists('dist/asset-1.ts'), false)
 
     await replaceInFile({
-      files: 'src/index.js',
+      files: 'src/index.ts',
       from: 'hey',
       to: 'ho'
     })
 
     await setTimeout(500)
 
-    assert.strictEqual(await pathExists('dist/asset-1.js'), false)
+    assert.strictEqual(await pathExists('dist/asset-1.ts'), false)
 
     await watcher.close()
 
     await replaceInFile({
-      files: 'src/index.js',
+      files: 'src/index.ts',
       from: 'ho',
       to: 'hey'
     })
@@ -453,14 +449,14 @@ await describe('Options', async () => {
       targets: [{
         dest: 'dist',
         src: [
-          'src/assets/asset-1.js',
-          'src/assets/asset-2.js'
+          'src/assets/asset-1.ts',
+          'src/assets/asset-2.ts'
         ]
       }]
     })
 
-    assert.strictEqual(await pathExists('dist/asset-1.js'), true)
-    assert.strictEqual(await pathExists('dist/asset-2.js'), true)
+    assert.strictEqual(await pathExists('dist/asset-1.ts'), true)
+    assert.strictEqual(await pathExists('dist/asset-2.ts'), true)
   })
 
   await test('Flatten', async () => {
@@ -468,8 +464,8 @@ await describe('Options', async () => {
       flatten: false,
       targets: [{
         src: [
-          'src/assets/asset-1.js',
-          'src/assets/asset-2.js'
+          'src/assets/asset-1.ts',
+          'src/assets/asset-2.ts'
         ],
         dest: 'dist'
       },
@@ -484,8 +480,8 @@ await describe('Options', async () => {
       }]
     })
 
-    assert.strictEqual(await pathExists('dist/assets/asset-1.js'), true)
-    assert.strictEqual(await pathExists('dist/assets/asset-2.js'), true)
+    assert.strictEqual(await pathExists('dist/assets/asset-1.ts'), true)
+    assert.strictEqual(await pathExists('dist/assets/asset-2.ts'), true)
     assert.strictEqual(await pathExists('dist/assets/css/css-1.css'), true)
     assert.strictEqual(await pathExists('dist/assets/css/css-2.css'), true)
     assert.strictEqual(await pathExists('dist/assets/scss/scss-1-renamed.scss'), true)
@@ -495,22 +491,22 @@ await describe('Options', async () => {
 
   await test('Rest options', async () => {
     await build({
-      ignore: ['**/asset-1.js'],
+      ignore: ['**/asset-1.ts'],
       targets: [
-        { src: 'src/assets/asset-1.js', dest: 'dist' }
+        { src: 'src/assets/asset-1.ts', dest: 'dist' }
       ]
     })
 
-    assert.strictEqual(await pathExists('dist/asset-1.js'), false)
+    assert.strictEqual(await pathExists('dist/asset-1.ts'), false)
   })
 
   await test('Rest target options', async () => {
     await build({
       targets: [
-        { src: 'src/assets/asset-1.js', dest: 'dist', ignore: ['**/asset-1.js'] }
+        { src: 'src/assets/asset-1.ts', dest: 'dist', ignore: ['**/asset-1.ts'] }
       ]
     })
 
-    assert.strictEqual(await pathExists('dist/asset-1.js'), false)
+    assert.strictEqual(await pathExists('dist/asset-1.ts'), false)
   })
 })
